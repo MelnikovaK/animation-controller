@@ -5,21 +5,38 @@ class AnimationController {
 	  	this.width = animation_config.width;
 	  	this.height = animation_config.height;
 	  	this.scale = animation_config.scale;  		
+
+	  	this.canvas_id = canvas_id;
   	}
 
-  	if ( canvas_id ) {
-  		this.initStage(canvas_id);
-  	}
+  	this.preloadAssets(animation_config.manifest);
   }
 
-  initStage(canvas_id) {
-  	var stage = this.stage = new createjs.Stage(canvas_id);
+  preloadAssets(manifest) {
+  	var scope = this;
+  	var loader = new createjs.LoadQueue(false);
+		loader.addEventListener("fileload", handleFileLoad);
+		loader.addEventListener("complete", handleComplete);
+		loader.loadManifest(manifest);
 
-  	//update the stage
-  	stage.update();
+		function handleFileLoad(evt) {
+			if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
+		}
+
+		//init stage
+		function handleComplete() {
+	  	var exportRoot = new lib.trener();
+	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
+			stage.addChild(exportRoot);
+	  	stage.update();
+
+	  	createjs.Ticker.setFPS(25);
+			createjs.Ticker.addEventListener("tick", stage);
+		}
   }
 
-  createAnimationObject(width, height, animation_scale) {
+
+  createAnimationObject() {
 
   }
 }

@@ -2,6 +2,7 @@ var animation_config = {
   width: 300,
   height: 300,
   scale: 1,
+  path: 'assets/',
   manifest: [
     {src:"images/Tr_1_head.png", id:"Tr_1_head"},
     {src:"images/Tr_1_head_closed.png", id:"Tr_1_head_closed"},
@@ -35,14 +36,21 @@ canvas.height = 300;
 var body = document.getElementsByTagName("body")[0];
 body.appendChild(canvas);
 
+//
+var newScript = document.createElement("script");
+newScript.type = "text/javascript";
+newScript.src = animation_config.path + animation_config.animation_file;
+body.appendChild(newScript);
+
+
 //create animation controller
 let animationController = new AnimationController( animation_config, canvas.id );
 var timestamp = 0;
 
 
-animationController.createAnimationObject();
-animationController.playAnimation(timestamp);
-animationController.pauseAnimation();
-animationController.resumeAnimation();
-animationController.removeObject();
+// animationController.createAnimationObject();
+// animationController.playAnimation(timestamp);
+// animationController.pauseAnimation();
+// animationController.resumeAnimation();
+// animationController.removeObject();
 
