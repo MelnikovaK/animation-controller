@@ -1,4 +1,5 @@
 (function (lib, img, cjs) {
+	console.log('init ttrener')
 
 var p; // shortcut to reference prototypes
 

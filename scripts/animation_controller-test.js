@@ -1,6 +1,6 @@
 var animation_config = {  
-  width: 300,
-  height: 300,
+  width: 1,
+  height: 1,
   scale: 1,
   path: 'assets/',
   manifest: [
@@ -28,20 +28,23 @@ var animation_config = {
   animation_file: "trener.js"
 };
 
-//create canvas for animation
-var canvas = document.createElement('canvas');
-canvas.id = "animationCanvas";
-canvas.width = 300;
-canvas.height = 300;
-var body = document.getElementsByTagName("body")[0];
-body.appendChild(canvas);
-
 //
 var newScript = document.createElement("script");
 newScript.type = "text/javascript";
 newScript.src = animation_config.path + animation_config.animation_file;
+var body = document.getElementsByTagName("body")[0];
 body.appendChild(newScript);
 
+//create canvas for animation
+var canvas = document.createElement('canvas');
+canvas.id = "animationCanvas";
+canvas.width = 900;
+canvas.height = 900;
+body.appendChild(canvas);
+
+
+//add animation object
+// animation_config.animation_object = new lib.trener();
 
 //create animation controller
 let animationController = new AnimationController( animation_config, canvas.id );

@@ -6,6 +6,8 @@ class AnimationController {
 	  	this.height = animation_config.height;
 	  	this.scale = animation_config.scale;  		
 
+	  	this.animation_object = animation_config.animation_object;
+
 	  	this.canvas_id = canvas_id;
   	}
 
@@ -25,8 +27,13 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
-	  	var exportRoot = new lib.trener();
+	  	var exportRoot = scope.animation_object = new lib.trener();
 	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
+
+	  	exportRoot.scale = scope.scale;
+	  	exportRoot.scaleX = scope.width;
+	  	exportRoot.scaleY = scope.height;
+	  	
 			stage.addChild(exportRoot);
 	  	stage.update();
 
