@@ -45,26 +45,19 @@ class AnimationController {
   }
 
   removeAnimationObject() {
-  	this.animation_object.tickChildren = false;
-		// this.stage.removeChild(this.animation_object);
+		this.stage.removeChild(this.animation_object);
   }
 
   addAnimationObject() {
-  	this.animation_object.tickChildren = true;
-		// this.stage.addChild(this.animation_object);
+		this.stage.addChild(this.animation_object);
   }
 
   pauseAnimation() {
-  	this.animation_time = createjs.Ticker.getTime();
-  	// createjs.Ticker.stop();
-  	console.log(createjs.Ticker.getTime());
-  	createjs.Ticker.removeEventListener("tick", this.stage);
-  // 	console.log(createjs.Ticker.getPaused())
-		// createjs.Ticker.setPaused(true);
+  	this.animation_object.tickChildren = false;
   }
 
   resumeAnimation() {
-		createjs.Ticker.addEventListener("tick", this.stage);	
+  	this.animation_object.tickChildren = true;
   }
 
   mirrorX() {
