@@ -25,15 +25,9 @@ var animation_config = {
     {src:"images/Tr_Z_head.png", id:"Tr_Z_head"},
     {src:"images/Tr_Z_tors.png", id:"Tr_Z_tors"}
   ],
-  animation_file: "trener.js"
+  animation_file: "trener.js",
+  animation_object: new lib.trener()
 };
-
-//
-var newScript = document.createElement("script");
-newScript.type = "text/javascript";
-newScript.src = animation_config.path + animation_config.animation_file;
-var body = document.getElementsByTagName("body")[0];
-body.appendChild(newScript);
 
 //create canvas for animation
 var canvas = document.createElement('canvas');
@@ -41,7 +35,7 @@ var context = canvas.getContext('2d');
 canvas.id = "animationCanvas";
 canvas.width = 324;
 canvas.height = 315;
-
+var body = document.getElementsByTagName("body")[0];
 body.appendChild(canvas);
 
 
