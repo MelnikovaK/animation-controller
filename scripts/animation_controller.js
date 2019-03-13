@@ -27,9 +27,14 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
+
+	  	var exportRoot = scope.animation_object = new lib.Trener();
 	  	// var exportRoot = scope.animation_object = scope.animation;
-	  	var exportRoot = scope.animation_object = new lib.trener();
 	  	console.log('ANIMATION OBJ: ', exportRoot);
+	  	// console.log('Created OBJ: ', new lib.Trener());
+	  
+	  	console.log('LABELS: ', exportRoot.getLabels());
+
 	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
 	  	createContainer(stage);
 
@@ -40,6 +45,7 @@ class AnimationController {
 
 			scope.container.addChild(exportRoot);
 	  	stage.update();
+
 		}
 
 		function createContainer(stage) {
@@ -47,8 +53,8 @@ class AnimationController {
 			var width = stage.canvas.width;
 			var animation_container = scope.container = new createjs.Container();
 	  	stage.addChild(animation_container);
-	  	// animation_container.regX = width / 2; 
-	  	// animation_container.regY = height / 2; 
+	  	animation_container.regX = 0; 
+	  	animation_container.regY = 0; 
 		}
   }
 
@@ -78,7 +84,7 @@ class AnimationController {
   	var width = this.container.getBounds().width;
 		var animation_x = this.container.getBounds().x;
 		var result_x = width + animation_x;
-		
+
 		this.container.scaleX = (this.container.scaleX < 0 ) ? 1: -1;
   	this.container.x = this.container.x + this.container.scaleX * (-1) * result_x;
   }
@@ -91,6 +97,15 @@ class AnimationController {
 
 		this.container.scaleY = (this.container.scaleY < 0 ) ? 1: -1;
   	this.container.y = this.container.y + this.container.scaleY * (-1) * result_y;
+  }
+
+  getAnimationLabels() {
+  	return this.animation_object.getLabels();
+  }
+
+  playFromLabel(label) {
+  	console.log(label);
+  	this.animation_object.gotoAndPlay(label.position);
   }
 }
     
