@@ -27,7 +27,6 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
-			console.log('animation downloaded')
 	  	var exportRoot = scope.animation_object = new lib.trener();
 	  	console.log(exportRoot)
 	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
@@ -37,7 +36,10 @@ class AnimationController {
 	  	exportRoot.scaleX = scope.width;
 	  	exportRoot.scaleY = scope.height;
 
+
 			stage.addChild(exportRoot);
+
+  		
 	  	stage.update();
 		}
   }
@@ -65,12 +67,35 @@ class AnimationController {
   }
 
   mirrorX() {
-  	this.animation_object.scale = -1;
-  	// var object_matrix = this.animation_object.getMatrix();
-  	// object_matrix.translate(1, -1);
-  	// this.animation_object.addChild(object_matrix);
-  	// this.stage.update();
-  	// console.log(this.animation_object.getMatrix());
+  	var scale_x = this.animation_object.scaleX;
+  	var width = this.animation_object.getBounds().width;
+		var animation_x = this.animation_object.getBounds().x;
+		var result_x = width + animation_x;
+		if ( scale_x < 0 )
+		{
+	  	this.animation_object.scaleX = 1;
+	  	this.animation_object.x -= result_x;
+
+		} else {
+			this.animation_object.scaleX = -1;
+	  	this.animation_object.x += result_x;
+		}
+  }
+
+  mirrorY() {
+  	var scale_y = this.animation_object.scaleY;
+  	var height = this.animation_object.getBounds().height;
+		var animation_y = this.animation_object.getBounds().y;
+		var result_y = height + animation_y;
+		if ( scale_y < 0 )
+		{
+	  	this.animation_object.scaleY = 1;
+	  	this.animation_object.y -= result_y;
+
+		} else {
+			this.animation_object.scaleY = -1;
+	  	this.animation_object.y += result_y;
+		}
   }
 }
     
