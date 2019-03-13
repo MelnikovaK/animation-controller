@@ -37,9 +37,12 @@ body.appendChild(newScript);
 
 //create canvas for animation
 var canvas = document.createElement('canvas');
+var context = canvas.getContext('2d');
 canvas.id = "animationCanvas";
 canvas.width = 324;
 canvas.height = 315;
+context.translate(canvas.width / 2, canvas.height / 2);
+
 body.appendChild(canvas);
 
 
@@ -50,12 +53,15 @@ body.appendChild(canvas);
 let animationController = new AnimationController( animation_config, canvas.id );
 var timestamp = 0;
 
+var play_button = document.getElementsByClassName('Play')[0];
 var pause_button = document.getElementsByClassName('Pause')[0];
 var resume_button = document.getElementsByClassName('Resume')[0];
 var remove_button = document.getElementsByClassName('Remove')[0];
 var add_button = document.getElementsByClassName('Add')[0];
 var mirrorX_button = document.getElementsByClassName('mirrorX')[0];
 
+play_button.addEventListener('click', function() {
+  animationController.playAnimation()});
 pause_button.addEventListener('click', function() {
   animationController.pauseAnimation()});
 resume_button.addEventListener('click', function() {
@@ -65,4 +71,5 @@ remove_button.addEventListener('click', function() {
 add_button.addEventListener('click', function() {
   animationController.addAnimationObject()});
 mirrorX_button.addEventListener('click', function() {
-  animationController.mirrorX()});
+   animationController.mirrorX();
+});

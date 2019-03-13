@@ -27,6 +27,7 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
+			console.log('animation downloaded')
 	  	var exportRoot = scope.animation_object = new lib.trener();
 	  	console.log(exportRoot)
 	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
@@ -38,10 +39,12 @@ class AnimationController {
 
 			stage.addChild(exportRoot);
 	  	stage.update();
-
-	  	createjs.Ticker.setFPS(25);
-			createjs.Ticker.addEventListener("tick", stage);
 		}
+  }
+
+  playAnimation() {
+  	createjs.Ticker.setFPS(25);
+		createjs.Ticker.addEventListener("tick", this.stage);
   }
 
   removeAnimationObject() {
@@ -54,6 +57,7 @@ class AnimationController {
 
   pauseAnimation() {
   	this.animation_object.tickChildren = false;
+  	// this.stage.gotoAndPlay('Tr_C_Hand_1');
   }
 
   resumeAnimation() {
@@ -61,7 +65,12 @@ class AnimationController {
   }
 
   mirrorX() {
-  	this.animation_object.scaleX = -1;
+  	this.animation_object.scale = -1;
+  	// var object_matrix = this.animation_object.getMatrix();
+  	// object_matrix.translate(1, -1);
+  	// this.animation_object.addChild(object_matrix);
+  	// this.stage.update();
+  	// console.log(this.animation_object.getMatrix());
   }
 }
     
