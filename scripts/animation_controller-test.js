@@ -40,8 +40,6 @@ body.appendChild(canvas);
 //add animation object
 // animation_config.animation_object = new lib.trener();
 
-
-
 //create animation controller
 let animationController = new AnimationController( animation_config, canvas.id );
 var animation_labels;
@@ -51,6 +49,13 @@ window.addEventListener("assets_loaded", function() {
   var animation_object = new lib.Trener();
   animationController.createAnimationObject(animation_object)
 });
+
+
+window.addEventListener("label_changed", function(e) {
+  console.log( 'Label has been changed from: ' + e.detail.previous_label + ' to: ' + e.detail.current_label );
+});
+        
+
 
 var play_button = document.getElementsByClassName('Play')[0];
 var pause_button = document.getElementsByClassName('Pause')[0];

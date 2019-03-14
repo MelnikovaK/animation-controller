@@ -67,7 +67,8 @@ class AnimationController {
 		createjs.Ticker.addEventListener("tick", this.stage);
 		createjs.Ticker.addEventListener('tick', function() {
 			if ( current_label != scope.animation_object.currentLabel) {
-				console.log( 'Label has been changed from: ' + current_label + ' to: ' + scope.animation_object.currentLabel );
+				var event = new CustomEvent( 'label_changed', { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
+	  		window.dispatchEvent(event);
 				current_label = scope.animation_object.currentLabel;
 			}
 		})
