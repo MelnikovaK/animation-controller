@@ -1,6 +1,6 @@
 class AnimationController {
 
-  constructor(animation_config, canvas_id, animation_object) {
+  constructor(animation_config, canvas_id) {
   	if ( animation_config ) {
 
 
@@ -26,29 +26,33 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
-	  	var exportRoot = scope.animation_object = new lib.Trener();
-	  	console.log('ANIMATION OBJ: ', scope.animation_object);
+	  	var event = new CustomEvent( 'assets_loaded' );
+	  	window.dispatchEvent(event);
+  	}		
+  }
 
-	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
-	  	createContainer(stage);
+  createAnimationObject(obj) {
+  	var scope = this;
+  	this.animation_object = obj;
 
-	  	//scaling
-	  	scope.animation_object.scale = scope.scale;
-	  	scope.animation_object.scaleX = scope.width;
-	  	scope.animation_object.scaleY = scope.height;
+  	var stage = this.stage = new createjs.Stage(this.canvas_id);
+  	createContainer(stage);
 
-			scope.container.addChild(scope.animation_object);
-	  	stage.update();
+  	//scaling
+  	this.animation_object.scale = this.scale;
+  	this.animation_object.scaleX = this.width;
+  	this.animation_object.scaleY = this.height;
 
-	  	// scope.animation_object.onAnimationEnd = function() {
-	  	// 	console.log('animation end')
-  	}
+		this.container.addChild(this.animation_object);
+  	stage.update();
 
-		function createContainer(stage) {
+  	function createContainer(stage) {
 			var height = stage.canvas.height;
 			var width = stage.canvas.width;
 			var animation_container = scope.container = new createjs.Container();
 	  	stage.addChild(animation_container);
+	  	
+	  	//container properties
 	  	animation_container.regX = width / 2; 
 	  	animation_container.regY = height / 2; 
 	  	animation_container.x = width / 2;
@@ -61,7 +65,7 @@ class AnimationController {
   	var current_label;
   	createjs.Ticker.setFPS(25);
 		createjs.Ticker.addEventListener("tick", this.stage);
-		createjs.Ticker.on('tick', function() {
+		createjs.Ticker.addEventListener('tick', function() {
 			if ( current_label != scope.animation_object.currentLabel) {
 				console.log( 'Label has been changed from: ' + current_label + ' to: ' + scope.animation_object.currentLabel );
 				current_label = scope.animation_object.currentLabel;

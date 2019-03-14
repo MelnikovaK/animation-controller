@@ -41,11 +41,16 @@ body.appendChild(canvas);
 // animation_config.animation_object = new lib.trener();
 
 
-var animation_object = new lib.Trener();
 
 //create animation controller
-let animationController = new AnimationController( animation_config, canvas.id, animation_object );
+let animationController = new AnimationController( animation_config, canvas.id );
 var animation_labels;
+
+//create animation object
+window.addEventListener("assets_loaded", function() {
+  var animation_object = new lib.Trener();
+  animationController.createAnimationObject(animation_object)
+});
 
 var play_button = document.getElementsByClassName('Play')[0];
 var pause_button = document.getElementsByClassName('Pause')[0];
