@@ -37,12 +37,10 @@ canvas.height = 315;
 var body = document.getElementsByTagName("body")[0];
 body.appendChild(canvas);
 
-//add animation object
-// animation_config.animation_object = new lib.trener();
-
 //create animation controller
 let animationController = new AnimationController( animation_config, canvas.id );
 var animation_labels;
+
 
 //create animation object
 window.addEventListener("assets_loaded", function() {
@@ -54,8 +52,11 @@ window.addEventListener("assets_loaded", function() {
 window.addEventListener("label_changed", function(e) {
   console.log( 'Label has been changed from: ' + e.detail.previous_label + ' to: ' + e.detail.current_label );
 });
-        
 
+window.addEventListener("animation_cycle_finished", function(e) {
+  console.log( 'ANIMATION CYCLE FINISHED' );
+});
+        
 
 var play_button = document.getElementsByClassName('Play')[0];
 var pause_button = document.getElementsByClassName('Pause')[0];

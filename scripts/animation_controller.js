@@ -3,11 +3,9 @@ class AnimationController {
   constructor(animation_config, canvas_id) {
   	if ( animation_config ) {
 
-
 	  	this.width = animation_config.width;
 	  	this.height = animation_config.height;
 	  	this.scale = animation_config.scale;  		
-
 	  	this.canvas_id = canvas_id;
   	}
   	this.preloadAssets(animation_config.manifest);
@@ -63,6 +61,7 @@ class AnimationController {
   playAnimation() {
   	var scope = this;
   	var current_label;
+  	var last_frame = scope.animation_object.totalFrames - 1;
   	createjs.Ticker.setFPS(25);
 		createjs.Ticker.addEventListener("tick", this.stage);
 		createjs.Ticker.addEventListener('tick', function() {
@@ -70,6 +69,10 @@ class AnimationController {
 				var event = new CustomEvent( 'label_changed', { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
 	  		window.dispatchEvent(event);
 				current_label = scope.animation_object.currentLabel;
+			}
+			if ( scope.animation_object.currentFrame == last_frame ) {
+				var event = new CustomEvent( 'animation_cycle_finished');
+	  		window.dispatchEvent(event);
 			}
 		})
   }
