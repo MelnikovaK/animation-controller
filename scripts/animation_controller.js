@@ -24,17 +24,30 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
+	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
+  		createContainer(stage);
+
+  		function createContainer(stage) {
+				var height = stage.canvas.height;
+				var width = stage.canvas.width;
+				var animation_container = scope.container = new createjs.Container();
+		  	stage.addChild(animation_container);
+		  	
+		  	//container properties
+		  	animation_container.regX = width / 2; 
+		  	animation_container.regY = height / 2; 
+		  	animation_container.x = width / 2;
+		  	animation_container.y = height / 2;
+			}
+
 	  	var event = new CustomEvent( 'assets_loaded' );
 	  	window.dispatchEvent(event);
   	}		
   }
 
-  createAnimationObject(obj) {
+  addAnimationObject(obj) {
   	var scope = this;
   	this.animation_object = obj;
-
-  	var stage = this.stage = new createjs.Stage(this.canvas_id);
-  	createContainer(stage);
 
   	//scaling
   	this.animation_object.scale = this.scale;
@@ -42,20 +55,7 @@ class AnimationController {
   	this.animation_object.scaleY = this.height;
 
 		this.container.addChild(this.animation_object);
-  	stage.update();
-
-  	function createContainer(stage) {
-			var height = stage.canvas.height;
-			var width = stage.canvas.width;
-			var animation_container = scope.container = new createjs.Container();
-	  	stage.addChild(animation_container);
-	  	
-	  	//container properties
-	  	animation_container.regX = width / 2; 
-	  	animation_container.regY = height / 2; 
-	  	animation_container.x = width / 2;
-	  	animation_container.y = height / 2;
-		}
+  	this.stage.update();
   }
 
   playAnimation() {
@@ -80,11 +80,6 @@ class AnimationController {
   removeAnimationObject() {
 		this.container.removeChild(this.animation_object);
   }
-
-  addAnimationObject() {
-		this.container.addChild(this.animation_object);
-  }
-
   pauseAnimation() {
   	this.animation_object.tickEnabled = false;
   }

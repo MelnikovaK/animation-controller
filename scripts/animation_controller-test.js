@@ -24,8 +24,7 @@ var animation_config = {
     {src:"images/Tr_Z_hand_3.png", id:"Tr_Z_hand_3"},
     {src:"images/Tr_Z_head.png", id:"Tr_Z_head"},
     {src:"images/Tr_Z_tors.png", id:"Tr_Z_tors"}
-  ],
-  animation_file: "trener.js"
+  ]
 };
 
 //create canvas for animation
@@ -45,7 +44,7 @@ var animation_labels;
 //create animation object
 window.addEventListener("assets_loaded", function() {
   var animation_object = new lib.Trener();
-  animationController.createAnimationObject(animation_object)
+  animationController.addAnimationObject(animation_object)
 });
 
 
@@ -78,7 +77,7 @@ resume_button.addEventListener('click', function() {
 remove_button.addEventListener('click', function() {
   animationController.removeAnimationObject()});
 add_button.addEventListener('click', function() {
-  animationController.addAnimationObject()});
+  animationController.addAnimationObject(new lib.Trener())});
 mirrorX_button.addEventListener('click', function() {
    animationController.mirrorX();
 });
