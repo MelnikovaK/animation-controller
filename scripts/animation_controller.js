@@ -9,7 +9,6 @@ class AnimationController {
 	  	this.scale = animation_config.scale;  		
 
 	  	this.canvas_id = canvas_id;
-	  	// this.animation_object = animation_object;
   	}
   	this.preloadAssets(animation_config.manifest);
   }
@@ -28,6 +27,7 @@ class AnimationController {
 		//init stage
 		function handleComplete() {
 	  	var exportRoot = scope.animation_object = new lib.Trener();
+	  	console.log('ANIMATION OBJ: ', scope.animation_object);
 
 	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
 	  	createContainer(stage);
@@ -40,7 +40,9 @@ class AnimationController {
 			scope.container.addChild(scope.animation_object);
 	  	stage.update();
 
-		}
+	  	// scope.animation_object.onAnimationEnd = function() {
+	  	// 	console.log('animation end')
+  	}
 
 		function createContainer(stage) {
 			var height = stage.canvas.height;
@@ -55,9 +57,16 @@ class AnimationController {
   }
 
   playAnimation() {
+  	var scope = this;
+  	var current_label;
   	createjs.Ticker.setFPS(25);
 		createjs.Ticker.addEventListener("tick", this.stage);
-		console.log(this.animation_object.getBounds())
+		createjs.Ticker.on('tick', function() {
+			if ( current_label != scope.animation_object.currentLabel) {
+				console.log( 'Label has been changed from: ' + current_label + ' to: ' + scope.animation_object.currentLabel );
+				current_label = scope.animation_object.currentLabel;
+			}
+		})
   }
 
   removeAnimationObject() {
@@ -69,11 +78,11 @@ class AnimationController {
   }
 
   pauseAnimation() {
-  	this.animation_object.tickChildren = false;
+  	this.animation_object.tickEnabled = false;
   }
 
   resumeAnimation() {
-  	this.animation_object.tickChildren = true;
+  	this.animation_object.tickEnabled = true;
   }
 
   mirrorX() {
@@ -85,11 +94,10 @@ class AnimationController {
   }
 
   getAnimationLabels() {
-  	return this.animation_object.getLabels();
+  	return this.animation_object.labels;
   }
 
   playFromLabel(label) {
-  	console.log(label);
   	this.animation_object.gotoAndPlay(label.position);
   }
 }
