@@ -1,6 +1,6 @@
 class AnimationController {
 
-  constructor(animation_config, canvas_id) {
+  constructor(animation_config, canvas_id, animation_object) {
   	if ( animation_config ) {
 
 
@@ -9,7 +9,7 @@ class AnimationController {
 	  	this.scale = animation_config.scale;  		
 
 	  	this.canvas_id = canvas_id;
-	  	this.animation = animation_config.animation_object;
+	  	// this.animation_object = animation_object;
   	}
   	this.preloadAssets(animation_config.manifest);
   }
@@ -27,23 +27,17 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
-
 	  	var exportRoot = scope.animation_object = new lib.Trener();
-	  	// var exportRoot = scope.animation_object = scope.animation;
-	  	console.log('ANIMATION OBJ: ', exportRoot);
-	  	// console.log('Created OBJ: ', new lib.Trener());
-	  
-	  	console.log('LABELS: ', exportRoot.getLabels());
 
 	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
 	  	createContainer(stage);
 
 	  	//scaling
-	  	exportRoot.scale = scope.scale;
-	  	exportRoot.scaleX = scope.width;
-	  	exportRoot.scaleY = scope.height;
+	  	scope.animation_object.scale = scope.scale;
+	  	scope.animation_object.scaleX = scope.width;
+	  	scope.animation_object.scaleY = scope.height;
 
-			scope.container.addChild(exportRoot);
+			scope.container.addChild(scope.animation_object);
 	  	stage.update();
 
 		}
@@ -53,14 +47,17 @@ class AnimationController {
 			var width = stage.canvas.width;
 			var animation_container = scope.container = new createjs.Container();
 	  	stage.addChild(animation_container);
-	  	animation_container.regX = 0; 
-	  	animation_container.regY = 0; 
+	  	animation_container.regX = width / 2; 
+	  	animation_container.regY = height / 2; 
+	  	animation_container.x = width / 2;
+	  	animation_container.y = height / 2;
 		}
   }
 
   playAnimation() {
   	createjs.Ticker.setFPS(25);
 		createjs.Ticker.addEventListener("tick", this.stage);
+		console.log(this.animation_object.getBounds())
   }
 
   removeAnimationObject() {
@@ -80,23 +77,11 @@ class AnimationController {
   }
 
   mirrorX() {
-  	var scale_x = this.container.scaleX;
-  	var width = this.container.getBounds().width;
-		var animation_x = this.container.getBounds().x;
-		var result_x = width + animation_x;
-
 		this.container.scaleX = (this.container.scaleX < 0 ) ? 1: -1;
-  	this.container.x = this.container.x + this.container.scaleX * (-1) * result_x;
   }
 
   mirrorY() {
-  	var scale_y = this.container.scaleY;
-  	var height = this.container.getBounds().height;
-		var animation_y = this.container.getBounds().y;
-		var result_y = height + animation_y;
-
 		this.container.scaleY = (this.container.scaleY < 0 ) ? 1: -1;
-  	this.container.y = this.container.y + this.container.scaleY * (-1) * result_y;
   }
 
   getAnimationLabels() {

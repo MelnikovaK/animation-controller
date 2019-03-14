@@ -25,8 +25,7 @@ var animation_config = {
     {src:"images/Tr_Z_head.png", id:"Tr_Z_head"},
     {src:"images/Tr_Z_tors.png", id:"Tr_Z_tors"}
   ],
-  animation_file: "trener.js",
-  animation_object: new lib.Trener()
+  animation_file: "trener.js"
 };
 
 //create canvas for animation
@@ -41,8 +40,11 @@ body.appendChild(canvas);
 //add animation object
 // animation_config.animation_object = new lib.trener();
 
+
+var animation_object = new lib.Trener();
+
 //create animation controller
-let animationController = new AnimationController( animation_config, canvas.id );
+let animationController = new AnimationController( animation_config, canvas.id, animation_object );
 var animation_labels;
 
 var play_button = document.getElementsByClassName('Play')[0];
