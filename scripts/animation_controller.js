@@ -6,6 +6,9 @@ class AnimationController {
   	this.LABEL_CHANGED = 'label_changed';
   	this.ANIMATION_FINISHED = 'animation_cycle_finished';
 
+  	//DEBUGGER
+  	this.debugger_on = false;
+
   	this.config = animation_config;
 
   	this.preloadAssets(animation_config);
@@ -140,9 +143,9 @@ class AnimationController {
 
   	//BUTTONS
   	this.debug_buttons = [
-  		$('<button id="play"> Play </button>'),
-  		$('<button id="pause"> Pause </button>'),
-  		$('<button id="resume"> Resume </button>')
+  		$('<button class="close-able" id="play"> Play </button>'),
+  		$('<button class="close-able" id="pause"> Pause </button>'),
+  		$('<button class="close-able" id="resume"> Resume </button>')
   	]
 
   	this.debug_buttons.forEach(function(x) {
@@ -161,12 +164,13 @@ class AnimationController {
   		scope.resumeAnimation();
   	});
 
+
   	//SELECTOR
   	var labels = this.getAnimationLabels();
   	console.log(labels)
-  	var labels_selector = '<select id="labels-selector">';
+  	var labels_selector = '<select class="close-able" id="labels-selector">';
   	labels.forEach(function(x) {
-  		labels_selector += '<option value="' + x.position + '">' + x.label + '</option>';
+  		labels_selector += '<option>' + x.label + '</option>';
   	})
   	labels_selector += '</select>';
 
@@ -177,11 +181,23 @@ class AnimationController {
 			scope.playFromLabel(selected_label);
 		})
 
-  	this.$debug_container.css('display', 'none');
+		this.$debug_container.append($('<button id="close"> x </button>'));
+
+  	$('#close').on('click', function() {
+  		scope.debugger_on = scope.debugger_on ? false : true;
+  		if ( scope.debugger_on ) scope.showDebugButtons();
+  		else scope.hideDebugButtons();
+  	});
+
+  	this.hideDebugButtons();
   }
 
   showDebugButtons() {
-  	this.$debug_container.css('display', 'inherit');
+  	$('.close-able').css('display', 'inherit');
+  }
+
+  hideDebugButtons() {
+  	$('.close-able').css('display', 'none');
   }
 
 
