@@ -6,75 +6,64 @@ class AnimationController {
   	this.ASSETS_LOADED = 'assets_loaded';
 
   	if ( animation_config ) {
-  		console.log(animation_config);
 
 	  	this.width = animation_config.width;
 	  	this.height = animation_config.height;
-	  	this.scale = animation_config.scale;  		
-	  	// this.canvas_id = canvas_id;
+	  	this.scale = animation_config.scale;  	
   	}
-  	this.preloadAssets(animation_config.manifest);
-  	// this.createContainer(animation_config.main_symbol);
+  	this.preloadAssets(animation_config);
   }
 
-  createContainer(id, width, height) {
-  	var canvas = document.createElement('canvas');
-		var context = canvas.getContext('2d');
-		canvas.id = id;
-		canvas.width = 324;
-		canvas.height = 315;
-		var body = document.getElementsByTagName("body")[0];
-		body.appendChild(canvas);
-  }
-  
-
-  preloadAssets(manifest) {
+  preloadAssets(animation_config) {
   	var scope = this;
   	var images = {};
   	var loader = new createjs.LoadQueue(false);
 		loader.addEventListener("fileload", handleFileLoad);
 		loader.addEventListener("complete", handleComplete);
-		loader.loadManifest(manifest);
+		loader.loadManifest(animation_config.manifest);
 
 		function handleFileLoad(evt) {
 			if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
 		}
 
-		//init stage
 		function handleComplete() {
-	  	// var stage = scope.stage = new createjs.Stage(scope.canvas_id);
-  		// createContainer(stage);
-
-  	// 	function createContainer(stage) {
-			// 	var height = stage.canvas.height;
-			// 	var width = stage.canvas.width;
-			// 	var animation_container = scope.container = new createjs.Container();
-		 //  	stage.addChild(animation_container);
-		  	
-		 //  	//container properties
-		 //  	animation_container.regX = width / 2; 
-		 //  	animation_container.regY = height / 2; 
-		 //  	animation_container.x = width / 2;
-		 //  	animation_container.y = height / 2;
-			// }
-
+			console.log(images);
 	  	var event = new CustomEvent( scope.ASSETS_LOADED );
 	  	window.dispatchEvent(event);
   	}		
   }
 
-  addAnimationObject(obj) {
-  	var scope = this;
-  	this.animation_object = obj;
 
-  	//scaling
-  	this.animation_object.scale = this.scale;
-  	this.animation_object.scaleX = this.width;
-  	this.animation_object.scaleY = this.height;
+  addAnimationObject(config, $container) {
+  	//add canvas
+  	var newCanvas = $('<canvas id="' + config.animation_name + '"</canvas>').width(config.container_width).height(config.container_height);
+		$container.append(newCanvas);
 
-		this.container.addChild(this.animation_object);
-  	this.stage.update();
+		//add stage
+		var stage = this.stage = new createjs.Stage(config.animation_name);
+		var height = stage.canvas.height;
+		var width = stage.canvas.width;
+		//add container
+		var animation_container = this.container = new createjs.Container();
+  	stage.addChild(animation_container);
+  	//container properties
+  	animation_container.regX = width / 2; 
+  	animation_container.regY = height / 2; 
+  	animation_container.x = width / 2;
+  	animation_container.y = height / 2;
   }
+  // addAnimationObject(obj) {
+  // 	var scope = this;
+  // 	this.animation_object = obj;
+
+  // 	//scaling
+  // 	this.animation_object.scale = this.scale;
+  // 	this.animation_object.scaleX = this.width;
+  // 	this.animation_object.scaleY = this.height;
+
+		// this.container.addChild(this.animation_object);
+  // 	this.stage.update();
+  // }
 
   playAnimation() {
   	var scope = this;

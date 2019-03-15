@@ -3,7 +3,7 @@
     "width": 310,
     "height": 286,
     "animation": "scarfman.js",
-    "main_symbol": "Scarfman",
+    "animation_name": "Scarfman",
     "manifest": [
         {"src":"images/Golova.png", "id":"Golova"},
         {"src":"images/Golova_2.png", "id":"Golova_2"},

@@ -6,18 +6,6 @@
 </head>
 <body>
 
-<!--   <button class="Play"> Play </button>
-  <button class="Pause"> Pause </button>
-  <button class="Resume"> Resume </button>
-  <button class="Remove"> Remove </button>
-  <button class="Add"> Add </button>
-  <button class="mirrorX"> Mirror X </button>
-  <button class="mirrorY"> Mirror Y </button>
-
-  <button class="goClocks"> Go Clocks </button>
-  <button class="goYawning"> go Yawning </button> -->
-
-
   <script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
   <script src="http://code.createjs.com/tweenjs-0.4.0.min.js"></script>
   <script src="http://code.createjs.com/movieclip-0.6.0.min.js"></script>
@@ -35,10 +23,18 @@
   
   <!-- <div class="animator-controller" data-animator="['assets/trener/', 'assets/player/']"> -->
   <!-- <div class="animator-controller" data-animator="assets/trener/, assets/player/"> -->
-  <div class="animator-controller" data-animator="assets/trener/">
+  <div class="animator-controller" data-animator='assets/trener/'>
   
-  <div id="anim1" class="animator-container" data-animator="{animation_name:'Trener', label:'start', loop:1, container_width:200, container_width:200, scale:'cover', show_debug:true, onfinish:{{animation_name:'trener', label:'run'} }}">
-    <canvas></canvas>
+  <div id="anim1" class="animator-container" data-animator='{
+    "animation_name": "Trener", 
+    "label": "start",
+    "loop": 1, 
+    "container_width": 324, 
+    "container_height": 315,
+    "scale": "cover",
+    "show_debug": true, 
+    "onfinish": { "animation_name": "trener", "label":"run" }}'>
+   <!--  <canvas></canvas>
     <div class="animator-container__debug">
       <button>play</button>
       <button>play</button>
@@ -47,10 +43,10 @@
       <button>x</button>
       <div class="animation-list"></div>
         <div class="animation-labels-list"></div>
-    </div>
+    </div> -->
   </div>
 
-  <div id="anim2" class="animator-container" data-animator="" >
+  <!-- <div id="anim2" class="animator-container" data-animator="" > -->
     
   </div>
 
