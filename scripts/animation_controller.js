@@ -1,40 +1,71 @@
 class AnimationController {
 
   constructor(animation_config) {
-
   	//CONSTANTS
   	this.ASSETS_LOADED = 'assets_loaded';
+  	this.LABEL_CHANGED = 'label_changed';
+  	this.ANIMATION_FINISHED = 'animation_cycle_finished';
 
-  	if ( animation_config ) {
-
-	  	this.width = animation_config.width;
-	  	this.height = animation_config.height;
-	  	this.scale = animation_config.scale;  	
-  	}
   	this.preloadAssets(animation_config);
+  	this.initDebugButtons();
+  	this.showDebugButtons();
   }
 
-  preloadAssets(animation_config) {
+ //  preloadAssets(animation_config) {
+	// console.log(createjs)
+
+ //  	var scope = this;
+ //  	var loader = new createjs.LoadQueue(false);
+	// 	loader.addEventListener("fileload", handleFileLoad);
+	// 	loader.addEventListener("complete", handleComplete);
+	// 	loader.loadManifest(animation_config);
+	// 	loader.loadFile(animation_config.animation);
+	// 	function handleFileLoad(evt) {
+	// 		if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
+	// 	}
+
+	// 	function handleComplete() {
+	//   	var event = new CustomEvent( scope.ASSETS_LOADED );
+	//   	window.dispatchEvent(event);
+ //  	}		
+ //  }
+
+ preloadAssets(manifest) {
   	var scope = this;
-  	var images = {};
   	var loader = new createjs.LoadQueue(false);
 		loader.addEventListener("fileload", handleFileLoad);
 		loader.addEventListener("complete", handleComplete);
-		loader.loadManifest(animation_config.manifest);
+		loader.loadManifest(manifest);
 
 		function handleFileLoad(evt) {
 			if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
 		}
 
+		//init stage
 		function handleComplete() {
-			console.log(images);
-	  	var event = new CustomEvent( scope.ASSETS_LOADED );
+	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
+  		createContainer(stage);
+
+  		function createContainer(stage) {
+				var height = stage.canvas.height;
+				var width = stage.canvas.width;
+				var animation_container = scope.container = new createjs.Container();
+		  	stage.addChild(animation_container);
+		  	
+		  	//container properties
+		  	animation_container.regX = width / 2; 
+		  	animation_container.regY = height / 2; 
+		  	animation_container.x = width / 2;
+		  	animation_container.y = height / 2;
+			}
+
+	  	var event = new CustomEvent( 'assets_loaded' );
 	  	window.dispatchEvent(event);
   	}		
   }
 
 
-  addAnimationObject(config, $container) {
+  addAnimationObject(config, $container, obj) {
   	//add canvas
   	var newCanvas = $('<canvas id="' + config.animation_name + '"</canvas>').width(config.container_width).height(config.container_height);
 		$container.append(newCanvas);
@@ -46,26 +77,21 @@ class AnimationController {
 		//add container
 		var animation_container = this.container = new createjs.Container();
   	stage.addChild(animation_container);
-  	//container properties
   	animation_container.regX = width / 2; 
   	animation_container.regY = height / 2; 
   	animation_container.x = width / 2;
   	animation_container.y = height / 2;
+
+  	//add animation
+  	this.animation_object = obj;
+
+		this.container.addChild(this.animation_object);
+  	stage.update();
+  	this.playAnimation();
   }
-  // addAnimationObject(obj) {
-  // 	var scope = this;
-  // 	this.animation_object = obj;
-
-  // 	//scaling
-  // 	this.animation_object.scale = this.scale;
-  // 	this.animation_object.scaleX = this.width;
-  // 	this.animation_object.scaleY = this.height;
-
-		// this.container.addChild(this.animation_object);
-  // 	this.stage.update();
-  // }
 
   playAnimation() {
+
   	var scope = this;
   	var current_label;
   	var last_frame = scope.animation_object.totalFrames - 1;
@@ -73,12 +99,12 @@ class AnimationController {
 		createjs.Ticker.addEventListener("tick", this.stage);
 		createjs.Ticker.addEventListener('tick', function() {
 			if ( current_label != scope.animation_object.currentLabel) {
-				var event = new CustomEvent( 'label_changed', { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
+				var event = new CustomEvent( scope.LABEL_CHANGED, { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
 	  		window.dispatchEvent(event);
 				current_label = scope.animation_object.currentLabel;
 			}
 			if ( scope.animation_object.currentFrame == last_frame ) {
-				var event = new CustomEvent( 'animation_cycle_finished');
+				var event = new CustomEvent( scope.ANIMATION_FINISHED );
 	  		window.dispatchEvent(event);
 			}
 		})
@@ -110,6 +136,26 @@ class AnimationController {
 
   playFromLabel(label,label_end,loop,onComplete) {
   	this.animation_object.gotoAndPlay(label.position);
+  }
+
+  // >>> DEBUG >>>
+  initDebugButtons() {
+  	var scope = this;
+  	this.$debug_container = $('<div id="debug-container"></div>');
+  	$('body').append(this.$debug_container);
+  	this.debug_buttons = [
+  		$('<button id="play"> Play </button>'),
+  		$('<button id="pause"> Pause </button>'),
+  		$('<button id="pause"> Resume </button>')
+  	]
+  	this.debug_buttons.forEach(function(x) {
+  		scope.$debug_container.append(x);
+  	});
+  	this.$debug_container.css('display', 'none');
+  }
+
+  showDebugButtons() {
+  	this.$debug_container.css('display', 'inherit');
   }
 
 }

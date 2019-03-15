@@ -1,4 +1,5 @@
 (function (lib, img, cjs) {
+
 var p; // shortcut to reference prototypes
 
 // stage content:
@@ -16,6 +17,7 @@ p.nominalBounds = new cjs.Rectangle(165,23.6,129,226.9);
 
 // symbols:
 (lib.Tr_1_head = function() {
+	console.log(img.Tr_1_head);
 	this.initialize(img.Tr_1_head);
 }).prototype = p = new cjs.Bitmap();
 p.nominalBounds = new cjs.Rectangle(0,0,84,117);
