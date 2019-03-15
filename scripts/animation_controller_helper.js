@@ -5,6 +5,8 @@
   //TODO: загрузку из data атрибута в отдельную функцию
   //TODO: относительный путь для скриптов
   //Универсальная передача объекта анимации
+  //TODO: разобраться с объединением информации
+  //TODO: loop
  $(function(){
    class AnimationHelper {
     constructor() {
@@ -26,7 +28,7 @@
       });
 
       $(window).on("label_changed", function(e) {
-        console.log( 'Label has been changed from: ' + e.detail.previous_label + ' to: ' + e.detail.current_label );
+        // console.log( 'Label has been changed from: ' + e.detail.previous_label + ' to: ' + e.detail.current_label );
       });
 
       $(window).on("animation_cycle_finished", function(e) {
@@ -47,7 +49,6 @@
       animations_array.forEach(function(x) {
         $.getJSON( x + scope.CONFIG_FILE, function ( _data ) {
           if( !_data ) return;
-          _data = Object.assign( _data, el_data );
           scope.animations[ _data.animation_name ] = new AnimationController( _data );
         });
       });
@@ -61,7 +62,8 @@
         var $e = $(e);
         var container_data = $e.data('animator');
         var animation_object = scope.animations[container_data.animation_name];
-        animation_object.addAnimationObject(container_data, $e, new lib.Trener());
+        if( container_data.animation_name == 'Trener') animation_object.addAnimationObject(container_data, $e, new lib.Trener());
+        if( container_data.animation_name == 'Scarfman') animation_object.addAnimationObject(container_data, $e, new lib.Scarfman());
       });
     }
   }

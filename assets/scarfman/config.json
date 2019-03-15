@@ -5,6 +5,7 @@
     "animation": {"src": "assets/scarfman/scarfman.js"},
     "animation_name": "Scarfman",
     "manifest": [
+        {"src":"assets/scarfman/scarfman.js", "id":"script"},
         {"src":"assets/scarfman/images/Golova.png", "id":"Golova"},
         {"src":"assets/scarfman/images/Golova_2.png", "id":"Golova_2"},
         {"src":"assets/scarfman/images/GolovaB.png", "id":"GolovaB"},

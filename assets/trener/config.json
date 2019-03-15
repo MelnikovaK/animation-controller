@@ -1,7 +1,8 @@
 {
     "fps": 25,
-    "width": 324,
-    "height": 315,
+    "scale": 0.5,
+    "width": 129,
+    "height": 226,
     "animation": {"src": "assets/trener/trener.js"},
     "animation_name": "Trener",
     "manifest": [
