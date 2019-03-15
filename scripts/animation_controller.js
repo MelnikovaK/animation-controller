@@ -78,6 +78,9 @@ class AnimationController {
  		if ( this.config.loop ) this.animation_object.loop = this.config.loop;
  		//show debug
  		if ( this.config.show_debug ) this.showDebugButtons();
+ 		//label
+ 		if ( this.config.label_start ) this.playFromLabel(this.config.label_start);
+ 		if ( this.config.label_end ) this.label_end = this.config.label_end;
 
  		console.log(this.animation_object);
 
@@ -98,6 +101,7 @@ class AnimationController {
 	  		window.dispatchEvent(event);
 				current_label = scope.animation_object.currentLabel;
 			}
+			if ( current_label == scope.label_end ) scope.animation_object.tickEnabled = false;
 			if ( scope.animation_object.currentFrame == last_frame ) {
 				var event = new CustomEvent( scope.ANIMATION_FINISHED );
 	  		window.dispatchEvent(event);
