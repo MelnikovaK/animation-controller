@@ -5,6 +5,7 @@
     "animation": {"src": "assets/trener/trener.js"},
     "animation_name": "Trener",
     "manifest": [
+        {"src":"assets/trener/trener.js", "id":"script"},
         {"src":"assets/trener/images/Tr_1_head.png", "id":"Tr_1_head"},
         {"src":"assets/trener/images/Tr_1_head_closed.png", "id":"Tr_1_head_closed"},
         {"src":"assets/trener/images/Tr_1_rukav.png", "id":"Tr_1_rukav"},

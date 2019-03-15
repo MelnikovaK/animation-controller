@@ -30,12 +30,12 @@ class AnimationController {
  //  	}		
  //  }
 
- preloadAssets(manifest) {
+ preloadAssets(animation_config) {
   	var scope = this;
   	var loader = new createjs.LoadQueue(false);
 		loader.addEventListener("fileload", handleFileLoad);
 		loader.addEventListener("complete", handleComplete);
-		loader.loadManifest(manifest);
+		loader.loadManifest(animation_config.manifest);
 
 		function handleFileLoad(evt) {
 			if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
@@ -43,23 +43,7 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
-	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
-  		createContainer(stage);
-
-  		function createContainer(stage) {
-				var height = stage.canvas.height;
-				var width = stage.canvas.width;
-				var animation_container = scope.container = new createjs.Container();
-		  	stage.addChild(animation_container);
-		  	
-		  	//container properties
-		  	animation_container.regX = width / 2; 
-		  	animation_container.regY = height / 2; 
-		  	animation_container.x = width / 2;
-		  	animation_container.y = height / 2;
-			}
-
-	  	var event = new CustomEvent( 'assets_loaded' );
+    	var event = new CustomEvent( 'assets_loaded' );
 	  	window.dispatchEvent(event);
   	}		
   }
@@ -69,6 +53,10 @@ class AnimationController {
   	//add canvas
   	var newCanvas = $('<canvas id="' + config.animation_name + '"</canvas>').width(config.container_width).height(config.container_height);
 		$container.append(newCanvas);
+
+		this.animation_object = obj;
+
+		console.log(this.animation_object);
 
 		//add stage
 		var stage = this.stage = new createjs.Stage(config.animation_name);
@@ -83,7 +71,6 @@ class AnimationController {
   	animation_container.y = height / 2;
 
   	//add animation
-  	this.animation_object = obj;
 
 		this.container.addChild(this.animation_object);
   	stage.update();
