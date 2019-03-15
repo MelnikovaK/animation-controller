@@ -1,18 +1,36 @@
 class AnimationController {
 
-  constructor(animation_config, canvas_id) {
+  constructor(animation_config) {
+
+  	//CONSTANTS
+  	this.ASSETS_LOADED = 'assets_loaded';
+
   	if ( animation_config ) {
+  		console.log(animation_config);
 
 	  	this.width = animation_config.width;
 	  	this.height = animation_config.height;
 	  	this.scale = animation_config.scale;  		
-	  	this.canvas_id = canvas_id;
+	  	// this.canvas_id = canvas_id;
   	}
   	this.preloadAssets(animation_config.manifest);
+  	// this.createContainer(animation_config.main_symbol);
   }
+
+  createContainer(id, width, height) {
+  	var canvas = document.createElement('canvas');
+		var context = canvas.getContext('2d');
+		canvas.id = id;
+		canvas.width = 324;
+		canvas.height = 315;
+		var body = document.getElementsByTagName("body")[0];
+		body.appendChild(canvas);
+  }
+  
 
   preloadAssets(manifest) {
   	var scope = this;
+  	var images = {};
   	var loader = new createjs.LoadQueue(false);
 		loader.addEventListener("fileload", handleFileLoad);
 		loader.addEventListener("complete", handleComplete);
@@ -24,23 +42,23 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
-	  	var stage = scope.stage = new createjs.Stage(scope.canvas_id);
-  		createContainer(stage);
+	  	// var stage = scope.stage = new createjs.Stage(scope.canvas_id);
+  		// createContainer(stage);
 
-  		function createContainer(stage) {
-				var height = stage.canvas.height;
-				var width = stage.canvas.width;
-				var animation_container = scope.container = new createjs.Container();
-		  	stage.addChild(animation_container);
+  	// 	function createContainer(stage) {
+			// 	var height = stage.canvas.height;
+			// 	var width = stage.canvas.width;
+			// 	var animation_container = scope.container = new createjs.Container();
+		 //  	stage.addChild(animation_container);
 		  	
-		  	//container properties
-		  	animation_container.regX = width / 2; 
-		  	animation_container.regY = height / 2; 
-		  	animation_container.x = width / 2;
-		  	animation_container.y = height / 2;
-			}
+		 //  	//container properties
+		 //  	animation_container.regX = width / 2; 
+		 //  	animation_container.regY = height / 2; 
+		 //  	animation_container.x = width / 2;
+		 //  	animation_container.y = height / 2;
+			// }
 
-	  	var event = new CustomEvent( 'assets_loaded' );
+	  	var event = new CustomEvent( scope.ASSETS_LOADED );
 	  	window.dispatchEvent(event);
   	}		
   }
@@ -80,6 +98,7 @@ class AnimationController {
   removeAnimationObject() {
 		this.container.removeChild(this.animation_object);
   }
+
   pauseAnimation() {
   	this.animation_object.tickEnabled = false;
   }
@@ -100,8 +119,9 @@ class AnimationController {
   	return this.animation_object.labels;
   }
 
-  playFromLabel(label) {
+  playFromLabel(label,label_end,loop,onComplete) {
   	this.animation_object.gotoAndPlay(label.position);
   }
+
 }
     

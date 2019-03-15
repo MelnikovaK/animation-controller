@@ -6,15 +6,16 @@
 </head>
 <body>
 
-  <button class="Play"> Play </button>
+<!--   <button class="Play"> Play </button>
   <button class="Pause"> Pause </button>
   <button class="Resume"> Resume </button>
   <button class="Remove"> Remove </button>
   <button class="Add"> Add </button>
   <button class="mirrorX"> Mirror X </button>
   <button class="mirrorY"> Mirror Y </button>
+
   <button class="goClocks"> Go Clocks </button>
-  <button class="goYawning"> go Yawning </button>
+  <button class="goYawning"> go Yawning </button> -->
 
 
   <script src="http://code.createjs.com/easeljs-0.6.0.min.js"></script>
@@ -22,11 +23,76 @@
   <script src="http://code.createjs.com/movieclip-0.6.0.min.js"></script>
   <script src="http://code.createjs.com/preloadjs-0.3.0.min.js"></script>
   <script type="text/javascript" src="scripts/libs/createjs.min.js"></script>
-  <script type="text/javascript" src="assets/trener.js"></script>
+  <script type="text/javascript" src="scripts/libs/jquery-3.3.1.min.js"></script>
+
+<!--   <script type="text/javascript" src="assets/trener.js"></script>
   <script type="text/javascript" src="assets/scarfman.js"></script>
-  <script type="text/javascript" src="assets/players.js"></script>
+  <script type="text/javascript" src="assets/players.js"></script> -->
 
   <script type="text/javascript" src="scripts/animation_controller.js"></script>
-  <script type="text/javascript" src="scripts/animation_controller-test.js"></script>
+  <script type="text/javascript" src="scripts/animation_controller_helper.js"></script>
+  <!-- <script type="text/javascript" src="scripts/animation_controller-test.js"></script> -->
+  
+  <!-- <div class="animator-controller" data-animator="['assets/trener/', 'assets/player/']"> -->
+  <!-- <div class="animator-controller" data-animator="assets/trener/, assets/player/"> -->
+  <div class="animator-controller" data-animator="assets/trener/">
+  
+  <div id="anim1" class="animator-container" data-animator="{animation_name:'Trener', label:'start', loop:1, container_width:200, container_width:200, scale:'cover', show_debug:true, onfinish:{{animation_name:'trener', label:'run'} }}">
+    <canvas></canvas>
+    <div class="animator-container__debug">
+      <button>play</button>
+      <button>play</button>
+      <button>play</button>
+      <button>play</button>
+      <button>x</button>
+      <div class="animation-list"></div>
+        <div class="animation-labels-list"></div>
+    </div>
+  </div>
+
+  <div id="anim2" class="animator-container" data-animator="" >
+    
+  </div>
+
 </body>
 </html>
+
+<!-- <script>
+  
+  $(function(){
+    var $element = $('.animator-controller');
+    if( !$element ) return;
+
+    $element.each(function(i,e){
+      var $e = $(e);
+      var el_data = $e.data('animator');
+      el_data = JSON.parse( el_data );
+
+      if( !el_data.assets_path ) return;
+
+      $.getJSON(function() el_data.assets_path+'config.json', function (_data) {
+        if( !_data ) return;
+          _data = Object.assign( _data, el_data );
+          new Animator( _data );
+      });  
+    });
+    
+  });
+
+
+  $('.btn').click(function(){
+    $(window).trigger('animator:play', {container:'anim1',animation:'trener',label:'start-label:end-label'});
+  });
+
+  $(window).on('animator:label-changed', function(e,data){
+    if( data.container == 'anim1' && data.prev_label == 'run'){
+      $(window).trigger('animator:play', {container:'anim1',animation:'trener',label:'start-label:end-label'});   
+    }
+  })
+
+  
+
+// bit per second
+// fps
+
+</script> -->

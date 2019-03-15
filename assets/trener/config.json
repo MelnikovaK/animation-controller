@@ -1,0 +1,29 @@
+{
+    "fps": 25,
+    "width": 310,
+    "height": 286,
+    "animation": "trener.js",
+    "main_symbol": "Trener",
+    "manifest": [
+        {"src":"images/Tr_1_head.png", "id":"Tr_1_head"},
+        {"src":"images/Tr_1_head_closed.png", "id":"Tr_1_head_closed"},
+        {"src":"images/Tr_1_rukav.png", "id":"Tr_1_rukav"},
+        {"src":"images/Tr_1_tors.png", "id":"Tr_1_tors"},
+        {"src":"images/Tr_C_Hand_1.png", "id":"Tr_C_Hand_1"},
+        {"src":"images/Tr_C_hand_2.png", "id":"Tr_C_hand_2"},
+        {"src":"images/Tr_C_hand_3.png", "id":"Tr_C_hand_3"},
+        {"src":"images/Tr_C_head.png", "id":"Tr_C_head"},
+        {"src":"images/Tr_C_tors.png", "id":"Tr_C_tors"},
+        {"src":"images/Tr_S_hand_1.png", "id":"Tr_S_hand_1"},
+        {"src":"images/Tr_S_hand_2.png", "id":"Tr_S_hand_2"},
+        {"src":"images/Tr_S_Hand_3.png", "id":"Tr_S_Hand_3"},
+        {"src":"images/Tr_S_hand_s.png", "id":"Tr_S_hand_s"},
+        {"src":"images/Tr_S_head.png", "id":"Tr_S_head"},
+        {"src":"images/Tr_S_tors.png", "id":"Tr_S_tors"},
+        {"src":"images/Tr_Z_hand_1.png", "id":"Tr_Z_hand_1"},
+        {"src":"images/Tr_Z_hand_2.png", "id":"Tr_Z_hand_2"},
+        {"src":"images/Tr_Z_hand_3.png", "id":"Tr_Z_hand_3"},
+        {"src":"images/Tr_Z_head.png", "id":"Tr_Z_head"},
+        {"src":"images/Tr_Z_tors.png", "id":"Tr_Z_tors"}
+    ]
+}
