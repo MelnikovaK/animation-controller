@@ -6,9 +6,6 @@ class AnimationController {
   	this.LABEL_CHANGED = 'label_changed';
   	this.ANIMATION_FINISHED = 'animation_cycle_finished';
 
-  	//ASSETS MANAGER
-  	this.AM = new AssetManager(this);
-
   	//DEBUGGER
   	this.debugger_on = false;
 
@@ -77,13 +74,12 @@ class AnimationController {
   	if ( typeof this.config.scale != 'number' ) this.$animation_cont.children().css('object-fit', this.config.scale);
  		else if( this.config.scale ) this.animation_object.scale = this.config.scale;
  		//loop
- 		if ( this.config.loop ) this.animation_object.loop = this.config.loop;
+ 		if ( this.config.loop ) this.loop_amount = this.config.loop;
  		//show debug
  		// if ( this.config.show_debug ) this.showDebugButtons();
  		//label
  		if ( this.config.label_start ) this.playFromLabel(this.config.label_start);
  		if ( this.config.label_end ) this.label_end = this.config.label_end;
-
  		// console.log(this.animation_object);
 
   }
@@ -95,9 +91,10 @@ class AnimationController {
 
   	var current_label;
   	var last_frame = scope.animation_object.totalFrames - 1;
-  	createjs.Ticker.setFPS(this.FPS);
-		createjs.Ticker.addEventListener("tick", this.stage);
-		createjs.Ticker.addEventListener('tick', function() {			if ( current_label != scope.animation_object.currentLabel) {
+  	createjs.Ticker.setFPS(this.FPS)
+		createjs.Ticker.addEventListener('tick', function() {			
+			scope.stage.update();
+			if ( current_label != scope.animation_object.currentLabel) {
 				var event = new CustomEvent( scope.LABEL_CHANGED, { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
 	  		window.dispatchEvent(event);
 				current_label = scope.animation_object.currentLabel;
@@ -106,8 +103,17 @@ class AnimationController {
 				var event = new CustomEvent( scope.ANIMATION_FINISHED );
 	  		window.dispatchEvent(event);
 			}
+
 			//end of animation
-			if ( current_label == scope.label_end ) scope.animation_object.tickEnabled = false;
+			if ( current_label == scope.label_end) {
+				if ( scope.loop_amount ) {
+					scope.loop_amount--;
+					if ( scope.loop_amount == 0 ) {
+						scope.animation_object.tickEnabled = false;
+						last_frame = undefined;
+					}
+				} else scope.animation_object.tickEnabled = false;
+			}
 		})
   }
 
@@ -136,16 +142,7 @@ class AnimationController {
   }
 
   playFromLabel(label,label_end,loop,onComplete) {
-  	console.log(label);
   	this.animation_object.gotoAndPlay(label);
   }
-
-  // >>> DEBUG >>>
-
- 
-
-
-
-
 }
     
