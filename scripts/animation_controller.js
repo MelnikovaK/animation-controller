@@ -5,13 +5,12 @@ class AnimationController {
   	this.ASSETS_LOADED = 'assets_loaded';
   	this.LABEL_CHANGED = 'label_changed';
   	this.ANIMATION_FINISHED = 'animation_cycle_finished';
+    this.ANIMATION_OBJECT_CHANGED = 'animation_object_changed';
 
-  	//ASSETS MANAGER
-    this.AM = new AssetManager(this);
+    this.INFINITY = 'infinity';
 
   	//DEBUGGER
   	this.show_debug_buttons = false;
-  	this.ON_DEBUG = false;
 
   	this.config = animation_config;
 
@@ -38,28 +37,22 @@ class AnimationController {
 
 
   addAnimationObject(config, obj) {
-  	//unit data
 		this.config = Object.assign( this.config, config );
 
 		this.animation_name = this.config.animation_name;
-
-		//create assets
-		this.AM.addAsset( this.config.animation_name , function() { return obj }, 3);
-
-  	//add animation
-		this.animation_object = this.AM.pullAsset( this.config.animation_name );
+		this.animation_object = obj;
 
 		if ( this.config.show_debug ) this.show_debug_buttons = true;
   }
 
   addAnimationToScreen($container) {
   	//add canvas
-  	var newCanvas = $('<canvas id="' + this.config.animation_name + '"</canvas>');
+  	var newCanvas = $('<canvas id="' + this.config.canvas_id + '"></canvas>');
 		$container.append(newCanvas);
 		this.$animation_cont = $container;
 
 		//add stage
-		var stage = this.stage = new createjs.Stage(this.config.animation_name);
+		var stage = this.stage = new createjs.Stage(this.config.canvas_id);
 		var height = stage.canvas.height = this.config.container_height;
 		var width = stage.canvas.width = this.config.container_width;
 
@@ -89,10 +82,10 @@ class AnimationController {
  		if ( this.config.loop ) this.loop_amount = this.config.loop;
 
  		//label
- 		if ( this.config.label_start ) this.playFromLabel(this.config.label_start);
+ 		if ( this.config.label_start ) this.label_start = this.config.label_start;
  		if ( this.config.label_end ) this.label_end = this.config.label_end;
- 		// console.log(this.animation_object);
 
+  	this.playFromLabel(this.label_start);//-
   }
 
   playAnimation() {
@@ -102,34 +95,46 @@ class AnimationController {
 
   	var current_label;
   	var last_frame = scope.animation_object.totalFrames - 1;
+  	var last_label = this.label_end || scope.animation_object.labels[scope.animation_object.labels.length - 1].label;
   	createjs.Ticker.setFPS(this.FPS)
-		createjs.Ticker.addEventListener('tick', function() {			
-			scope.stage.update();
-			if ( current_label != scope.animation_object.currentLabel) {
-				var event = new CustomEvent( scope.LABEL_CHANGED, { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
-	  		window.dispatchEvent(event);
-				current_label = scope.animation_object.currentLabel;
-			}
-			if ( scope.animation_object.currentFrame == last_frame ) {
-				var event = new CustomEvent( scope.ANIMATION_FINISHED );
-	  		window.dispatchEvent(event);
-			}
+		createjs.Ticker.addEventListener('tick', tick_stage)
 
-			//end of animation
-			if ( current_label == scope.label_end) {
-				if ( scope.loop_amount ) {
-					scope.loop_amount--;
-					if ( scope.loop_amount == 0 ) {
-						scope.animation_object.tickEnabled = false;
-						last_frame = undefined;
-					}
-				} else scope.animation_object.tickEnabled = false;
-			}
-		})
+    function tick_stage() {
+      scope.stage.update();
+      //label changed
+      if ( current_label != scope.animation_object.currentLabel) {
+        var event = new CustomEvent( scope.LABEL_CHANGED, { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
+        window.dispatchEvent(event);
+        current_label = scope.animation_object.currentLabel;
+      }
+      //finish animation cycle
+      if ( scope.animation_object.currentFrame == last_frame ) {
+        var event = new CustomEvent( scope.ANIMATION_FINISHED );
+        window.dispatchEvent(event);
+      }
+
+      //end of animation loop
+      if ( current_label == last_label && scope.loop_amount != scope.INFINITY) {
+        if ( scope.loop_amount ) {
+          scope.loop_amount--;
+          if ( scope.loop_amount <= 0 ) {
+            scope.animation_object.tickEnabled = false;
+            last_label = undefined;
+            if ( scope.config.onfinish ) {
+              scope.config = scope.config.onfinish;
+              scope.animation_object.tickEnabled = true;
+              scope.setAnimationParameteres();
+              last_label = scope.label_end || scope.animation_object.labels[scope.animation_object.labels.length - 1].label;
+            }
+          } else {
+            scope.playFromLabel(scope.label_start);
+          }        
+        } else scope.animation_object.tickEnabled = false;
+      }
+    }
   }
 
   removeAnimationObject() {
-  	this.AM.putAsset(this.animation_object);
 		this.container.removeChild(this.animation_object);
   }
 

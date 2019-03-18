@@ -21,21 +21,23 @@
   <div class="animator-controller" data-animator='assets/trener/, assets/scarfman/'>
   
   <div id="anim1" class="animator-container" data-animator='{
+    "canvas_id":"1",
     "animation_name": "Trener", 
     "label_start": "Clocks",
-    "label_end": "static",
-    "loop": 10, 
+    "label_end": "Static",
+    "loop": 1, 
     "container_width": 300, 
     "container_height": 300,
     "scale": "none",
     "show_debug": true, 
-    "onfinish": { "animation_name": "trener", "label":"run" }}'>
+    "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "stop", "loop": 1, "scale": "cover" }}'>
   </div>
 
   <div id="anim2" class="animator-container" data-animator='{
+    "canvas_id":"2",
     "animation_name": "Scarfman",
+    "loop": "infinity",
     "scale": "none",
-    "loop": 3,
     "container_width": 300, 
     "container_height": 200,
     "show_debug": false }'>

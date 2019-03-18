@@ -1,10 +1,8 @@
   // Отрисовка контейнера должна происходить только при работающей анимации  +
   // Нужен АссетМенеджер для хранения созданных экземплеров анимаций  +
 
-  //Универсальная передача объекта анимации
-  // при дебаге включить tickenabled  и заканчивтаь анимацию при смене лейбла
-  //TODO: инициализация контроллера без html
 
+  //TODO: инициализация контроллера без html
    class AnimationHelper {
     constructor() {
 
@@ -13,22 +11,20 @@
       //CONSTANTS
       this.CONFIG_FILE = 'config.json';
 
-      //
+      //animation objects
       this.animations = {};
+
+      //ASSETS MANAGER
+      this.AM = new AssetManager(this);
       
       this.getAssetsConfig();
-
-      //
-      $(window).on('assets_loaded', function(e) {
-        // scope.initAnimationConfig(e.detail.id);
-      });
 
       $(window).on("label_changed", function(e) {
         // console.log( 'Label has been changed from: ' + e.detail.previous_label + ' to: ' + e.detail.current_label );
       });
 
       $(window).on("animation_cycle_finished", function(e) {
-        console.log( 'ANIMATION CYCLE FINISHED' );
+        // console.log( 'ANIMATION CYCLE FINISHED' );
       });
               
     }
@@ -36,20 +32,23 @@
     getAssetsConfig() {
       var scope = this;
       $(function(){
-      scope.$containers = $('.animator-container');
-      scope.$controller = $('.animator-controller');
-      if( !scope.$controller ) return;
-  
-      var el_data = scope.$controller.data('animator');
-      var animations_array = el_data.split(',');
+        scope.$containers = $('.animator-container');
+        scope.$controller = $('.animator-controller');
 
-      animations_array.forEach(function(x) {
-        $.getJSON( x + scope.CONFIG_FILE, function ( _data ) {
-          if( !_data ) return;
-          scope.animations[ _data.animation_name ] = new AnimationController( _data );
+        if( !scope.$controller ) {
+          scope.$container = $('<div class="animator-controller"></div>')
+        }
+
+        var el_data = scope.$controller.data('animator');
+        var animations_array = el_data.split(',');
+
+        animations_array.forEach(function(x) {
+          $.getJSON( x + scope.CONFIG_FILE, function ( _data ) {
+            if( !_data ) return;
+            scope.animations[ _data.animation_name ] = new AnimationController( _data );
+          })
         })
-      })
-    });
+     });
     }
 
 
@@ -67,7 +66,9 @@
             config: container_data,
             object: obj
           };
-          obj.addAnimationObject(container_data, animation_obj);
+          scope.AM.addAsset( id , function() { return animation_obj }, 10);
+
+          obj.addAnimationObject(container_data, scope.AM.pullAsset( id ));
           scope.initDebugButtons(obj, id, $e);
         }
       });
@@ -118,6 +119,7 @@
       });
 
       $('#remove-' + obj_id).on('click', function() {
+        scope.AM.putAsset(animation_obj);
         animation_obj.removeAnimationObject();
       });
 
@@ -150,15 +152,13 @@
     }
 
     showDebugButtons(id) {
-      $('#hidden-content-' + id).css('display', 'inherit');
+      $('#hidden-content-' + id).css({'width': 'auto', 'height': 'auto'});
     }
 
     hideDebugButtons(id) {
-      $('#hidden-content-' + id).css('display', 'none');
+      $('#hidden-content-' + id).css({'width': 0, 'height': 0, 'overflow': 'hidden'});
     }
   }
-
-  // let animationHelper = new AnimationHelper();
 
 
   
