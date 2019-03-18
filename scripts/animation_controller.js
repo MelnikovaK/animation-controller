@@ -6,6 +6,9 @@ class AnimationController {
   	this.LABEL_CHANGED = 'label_changed';
   	this.ANIMATION_FINISHED = 'animation_cycle_finished';
 
+  	//ASSETS MANAGER
+  	this.AM = new AssetManager(this);
+
   	//DEBUGGER
   	this.debugger_on = false;
 
@@ -27,7 +30,7 @@ class AnimationController {
 
 		//init stage
 		function handleComplete() {
-    	var event = new CustomEvent( 'assets_loaded' );
+    	var event = new CustomEvent( scope.ASSETS_LOADED, { detail: {id: animation_config.animation_name}});
 	  	window.dispatchEvent(event);
   	}		
   }
@@ -61,7 +64,6 @@ class AnimationController {
   	stage.update();
 
 
-  	this.initDebugButtons();
   	this.setAnimationParameteres();
 
   }
@@ -72,17 +74,17 @@ class AnimationController {
   	//height
   	if ( this.config.height ) this.animation_object.scaleY = this.config.height / this.animation_object.getBounds().height;
   	//scale
-  	if ( typeof this.config.scale != 'number')this.$animation_cont.children().css('object-fit', this.config.scale);
+  	if ( typeof this.config.scale != 'number' ) this.$animation_cont.children().css('object-fit', this.config.scale);
  		else if( this.config.scale ) this.animation_object.scale = this.config.scale;
  		//loop
  		if ( this.config.loop ) this.animation_object.loop = this.config.loop;
  		//show debug
- 		if ( this.config.show_debug ) this.showDebugButtons();
+ 		// if ( this.config.show_debug ) this.showDebugButtons();
  		//label
  		if ( this.config.label_start ) this.playFromLabel(this.config.label_start);
  		if ( this.config.label_end ) this.label_end = this.config.label_end;
 
- 		console.log(this.animation_object);
+ 		// console.log(this.animation_object);
 
   }
 
@@ -95,17 +97,17 @@ class AnimationController {
   	var last_frame = scope.animation_object.totalFrames - 1;
   	createjs.Ticker.setFPS(this.FPS);
 		createjs.Ticker.addEventListener("tick", this.stage);
-		createjs.Ticker.addEventListener('tick', function() {
-			if ( current_label != scope.animation_object.currentLabel) {
+		createjs.Ticker.addEventListener('tick', function() {			if ( current_label != scope.animation_object.currentLabel) {
 				var event = new CustomEvent( scope.LABEL_CHANGED, { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
 	  		window.dispatchEvent(event);
 				current_label = scope.animation_object.currentLabel;
 			}
-			if ( current_label == scope.label_end ) scope.animation_object.tickEnabled = false;
 			if ( scope.animation_object.currentFrame == last_frame ) {
 				var event = new CustomEvent( scope.ANIMATION_FINISHED );
 	  		window.dispatchEvent(event);
 			}
+			//end of animation
+			if ( current_label == scope.label_end ) scope.animation_object.tickEnabled = false;
 		})
   }
 
@@ -134,75 +136,13 @@ class AnimationController {
   }
 
   playFromLabel(label,label_end,loop,onComplete) {
+  	console.log(label);
   	this.animation_object.gotoAndPlay(label);
   }
 
   // >>> DEBUG >>>
 
-
-  initDebugButtons() {
-  	var scope = this;
-  	this.$debug_container = $('<div id="debug-container"></div>');
-  	$('body').append(this.$debug_container);
-
-  	//BUTTONS
-  	this.debug_buttons = [
-  		$('<button class="close-able" id="play"> Play </button>'),
-  		$('<button class="close-able" id="pause"> Pause </button>'),
-  		$('<button class="close-able" id="resume"> Resume </button>')
-  	]
-
-  	this.debug_buttons.forEach(function(x) {
-  		scope.$debug_container.append(x);
-  	});
-
-  	$('#play').on('click', function() {
-  		scope.playAnimation();
-  	});
-
-  	$('#pause').on('click', function() {
-  		scope.pauseAnimation();
-  	});
-
-  	$('#resume').on('click', function() {
-  		scope.resumeAnimation();
-  	});
-
-
-  	//SELECTOR
-  	var labels = this.getAnimationLabels();
-  	console.log(labels)
-  	var labels_selector = '<select class="close-able" id="labels-selector">';
-  	labels.forEach(function(x) {
-  		labels_selector += '<option>' + x.label + '</option>';
-  	})
-  	labels_selector += '</select>';
-
-  	this.$debug_container.append($(labels_selector));
-
-		$('#labels-selector').change( function() {
-			var selected_label = $( "select option:selected" ).text();
-			scope.playFromLabel(selected_label);
-		})
-
-		this.$debug_container.append($('<button id="close"> x </button>'));
-
-  	$('#close').on('click', function() {
-  		scope.debugger_on = scope.debugger_on ? false : true;
-  		if ( scope.debugger_on ) scope.showDebugButtons();
-  		else scope.hideDebugButtons();
-  	});
-
-  	this.hideDebugButtons();
-  }
-
-  showDebugButtons() {
-  	$('.close-able').css('display', 'inherit');
-  }
-
-  hideDebugButtons() {
-  	$('.close-able').css('display', 'none');
-  }
+ 
 
 
 

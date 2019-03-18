@@ -19,11 +19,12 @@
 
   <script type="text/javascript" src="scripts/animation_controller.js"></script>
   <script type="text/javascript" src="scripts/animation_controller_helper.js"></script>
+  <script type="text/javascript" src="scripts/assets-manager.js"></script>
   <!-- <script type="text/javascript" src="scripts/animation_controller-test.js"></script> -->
   
   <!-- <div class="animator-controller" data-animator="['assets/trener/', 'assets/player/']"> -->
   <!-- <div class="animator-controller" data-animator="assets/trener/, assets/player/"> -->
-  <div class="animator-controller" data-animator='assets/trener/'>
+  <div class="animator-controller" data-animator='assets/trener/, assets/scarfman/'>
   
   <div id="anim1" class="animator-container" data-animator='{
     "animation_name": "Trener", 
@@ -37,11 +38,12 @@
     "onfinish": { "animation_name": "trener", "label":"run" }}'>
   </div>
 
-  <!-- <div id="anim2" class="animator-container" data-animator='{
+  <div id="anim2" class="animator-container" data-animator='{
     "animation_name": "Scarfman", 
     "container_width": 200, 
-    "container_height": 200}'>
-  </div> -->
+    "container_height": 200,
+    "show_debug": true }'>
+  </div>
     <!-- DEBUG BUTTONS-->
    <!--  <canvas></canvas>
     <div class="animator-container__debug">
