@@ -1,14 +1,9 @@
-  // Отрисовка контейнера должна происходить только при работающей анимации
-  // Нужен АссетМенеджер для хранения созданных экземплеров анимаций
+  // Отрисовка контейнера должна происходить только при работающей анимации  +
+  // Нужен АссетМенеджер для хранения созданных экземплеров анимаций  +
 
-  //TOOD: устранить урезание анимации
-  //TODO: загрузку из data атрибута в отдельную функцию
-  //TODO: относительный путь для скриптов
   //Универсальная передача объекта анимации
-  //TODO: show debug default
-  // где сделать assets manager????
-  //TODO: инициализация контроллера без html
   // при дебаге включить tickenabled  и заканчивтаь анимацию при смене лейбла
+  //TODO: инициализация контроллера без html
  $(function(){
    class AnimationHelper {
     constructor() {
@@ -23,8 +18,6 @@
       this.$containers = $('.animator-container');
       this.$controller = $('.animator-controller');
 
-      //ASSETS MANAGER
-      this.AM = new AssetManager(this);
 
       this.getAssetsConfig();
 
@@ -74,23 +67,25 @@
             object: obj
           }
           if( id == 'Trener') {
-            // scope.AM.addAsset(id , function() {return new lib.Trener}, 3);
-            obj.addAnimationObject(container_data, $e, new lib.Trener());
+            obj.addAnimationObject(container_data, new lib.Trener());
           }
-          else if( id == 'Scarfman') obj.addAnimationObject(container_data, $e, new lib.Scarfman());
+          else if( id == 'Scarfman') {
+            obj.addAnimationObject(container_data, new lib.Scarfman());
+          }
 
-          scope.initDebugButtons(obj, id, e);
+          scope.initDebugButtons(obj, id, $e);
         }
       });
     }
 
     // >>> DEBUG >>>
 
-    initDebugButtons(animation_obj, obj_id, container) {
+    initDebugButtons(animation_obj, obj_id, $container) {
       var scope = this;
-      var $container = $(container);
+      var $debugger_container = $('<div id="debugger-container-'+ obj_id +'"></div>');
+      $container.append($debugger_container);
       this.$hidden_content = $('<div id="hidden-content-'+ obj_id +'"></div>');
-      $container.append(this.$hidden_content);
+      $debugger_container.append(this.$hidden_content);
 
       //BUTTONS
       this.debug_buttons = [
@@ -98,14 +93,16 @@
         $('<button class="close-able" id="pause-'+ obj_id +'"> Pause </button>'),
         $('<button class="close-able" id="resume-'+ obj_id +'"> Resume </button>'),
         $('<button class="close-able" id="mirrorX-'+ obj_id +'"> Mirror X </button>'),
-        $('<button class="close-able" id="mirrorY-'+ obj_id +'"> Mirror Y </button>')
+        $('<button class="close-able" id="mirrorY-'+ obj_id +'"> Mirror Y </button>'),
+        $('<button class="close-able" id="remove-'+ obj_id +'"> Remove </button>')
       ]
 
       this.debug_buttons.forEach(function(x) {
         scope.$hidden_content.append(x);
       });
 
-      $('#play-' + obj_id).on('click', function() {
+      $('#play-' + obj_id).one('click', function() {
+        animation_obj.addAnimationToScreen($container);
         animation_obj.playAnimation();
       });
 
@@ -125,6 +122,10 @@
         animation_obj.mirrorY();
       });
 
+      $('#remove-' + obj_id).on('click', function() {
+        animation_obj.removeAnimationObject();
+      });
+
 
       //SELECTOR
       var labels = animation_obj.getAnimationLabels();
@@ -142,15 +143,15 @@
         animation_obj.playFromLabel(selected_label);
       })
 
-      $container.append($('<button id="close'+ obj_id +'"> x </button>'));
+      $debugger_container.append($('<button id="close'+ obj_id +'"> x </button>'));
 
       $('#close' + obj_id).on('click', function() {
-        animation_obj.debugger_on = animation_obj.debugger_on ? false : true;
-        if ( animation_obj.debugger_on ) scope.showDebugButtons(obj_id);
+        animation_obj.show_debug_buttons = animation_obj.show_debug_buttons ? false : true;
+        if ( animation_obj.show_debug_buttons ) scope.showDebugButtons(obj_id);
         else scope.hideDebugButtons(obj_id);
       });
 
-      this.hideDebugButtons();
+      if ( !animation_obj.show_debug_buttons ) this.hideDebugButtons(obj_id);
     }
 
     showDebugButtons(id) {

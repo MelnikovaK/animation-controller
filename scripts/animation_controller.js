@@ -6,8 +6,12 @@ class AnimationController {
   	this.LABEL_CHANGED = 'label_changed';
   	this.ANIMATION_FINISHED = 'animation_cycle_finished';
 
+  	//ASSETS MANAGER
+    this.AM = new AssetManager(this);
+
   	//DEBUGGER
-  	this.debugger_on = false;
+  	this.show_debug_buttons = false;
+  	this.ON_DEBUG = false;
 
   	this.config = animation_config;
 
@@ -33,19 +37,32 @@ class AnimationController {
   }
 
 
-  addAnimationObject(config, $container, obj) {
+  addAnimationObject(config, obj) {
   	//unit data
 		this.config = Object.assign( this.config, config );
 
+		this.animation_name = this.config.animation_name;
+
+		//create assets
+		this.AM.addAsset( this.config.animation_name , function() { return obj }, 3);
+
+  	//add animation
+		this.animation_object = this.AM.pullAsset( this.config.animation_name );
+
+		if ( this.config.show_debug ) this.show_debug_buttons = true;
+  }
+
+  addAnimationToScreen($container) {
   	//add canvas
-  	var newCanvas = $('<canvas id="' + this.config.animation_name + '"</canvas>').width(this.config.container_width).height(this.config.container_height);
+  	var newCanvas = $('<canvas id="' + this.config.animation_name + '"</canvas>');
 		$container.append(newCanvas);
 		this.$animation_cont = $container;
 
 		//add stage
 		var stage = this.stage = new createjs.Stage(this.config.animation_name);
-		var height = stage.canvas.height;
-		var width = stage.canvas.width;
+		var height = stage.canvas.height = this.config.container_height;
+		var width = stage.canvas.width = this.config.container_width;
+
 		//add container
 		var animation_container = this.container = new createjs.Container();
   	stage.addChild(animation_container);
@@ -54,15 +71,10 @@ class AnimationController {
   	animation_container.x = width / 2;
   	animation_container.y = height / 2;
 
-  	//add animation
-		this.animation_object = obj;
-
 		this.container.addChild(this.animation_object);
   	stage.update();
 
-
   	this.setAnimationParameteres();
-
   }
 
   setAnimationParameteres() {
@@ -75,8 +87,7 @@ class AnimationController {
  		else if( this.config.scale ) this.animation_object.scale = this.config.scale;
  		//loop
  		if ( this.config.loop ) this.loop_amount = this.config.loop;
- 		//show debug
- 		// if ( this.config.show_debug ) this.showDebugButtons();
+
  		//label
  		if ( this.config.label_start ) this.playFromLabel(this.config.label_start);
  		if ( this.config.label_end ) this.label_end = this.config.label_end;
@@ -118,6 +129,7 @@ class AnimationController {
   }
 
   removeAnimationObject() {
+  	this.AM.putAsset(this.animation_object);
 		this.container.removeChild(this.animation_object);
   }
 

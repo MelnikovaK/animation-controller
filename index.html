@@ -13,26 +13,20 @@
   <script type="text/javascript" src="scripts/libs/createjs.min.js"></script>
   <script type="text/javascript" src="scripts/libs/jquery-3.3.1.min.js"></script>
 
-<!--   <script type="text/javascript" src="assets/trener.js"></script>
-  <script type="text/javascript" src="assets/scarfman.js"></script>
-  <script type="text/javascript" src="assets/players.js"></script> -->
-
   <script type="text/javascript" src="scripts/animation_controller.js"></script>
   <script type="text/javascript" src="scripts/animation_controller_helper.js"></script>
   <script type="text/javascript" src="scripts/assets-manager.js"></script>
-  <!-- <script type="text/javascript" src="scripts/animation_controller-test.js"></script> -->
+  <script type="text/javascript" src="scripts/animation_controller-test.js"></script>
   
-  <!-- <div class="animator-controller" data-animator="['assets/trener/', 'assets/player/']"> -->
-  <!-- <div class="animator-controller" data-animator="assets/trener/, assets/player/"> -->
   <div class="animator-controller" data-animator='assets/trener/, assets/scarfman/'>
   
   <div id="anim1" class="animator-container" data-animator='{
     "animation_name": "Trener", 
     "label_start": "Clocks",
     "label_end": "static",
-    "loop": 1, 
-    "container_width": 500, 
-    "container_height": 500,
+    "loop": 10, 
+    "container_width": 300, 
+    "container_height": 300,
     "scale": "none",
     "show_debug": true, 
     "onfinish": { "animation_name": "trener", "label":"run" }}'>
@@ -41,22 +35,11 @@
   <div id="anim2" class="animator-container" data-animator='{
     "animation_name": "Scarfman",
     "scale": "none",
-    "container_width": 200, 
+    "loop": 3,
+    "container_width": 300, 
     "container_height": 200,
-    "show_debug": true }'>
+    "show_debug": false }'>
   </div>
-    <!-- DEBUG BUTTONS-->
-   <!--  <canvas></canvas>
-    <div class="animator-container__debug">
-      <button>play</button>
-      <button>play</button>
-      <button>play</button>
-      <button>play</button>
-      <button>x</button>
-      <div class="animation-list"></div>
-        <div class="animation-labels-list"></div>
-    </div> -->
-  <!-- <div id="anim2" class="animator-container" data-animator="" > -->
     
   </div>
 </body>
