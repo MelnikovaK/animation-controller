@@ -4,7 +4,7 @@
   //Универсальная передача объекта анимации
   // при дебаге включить tickenabled  и заканчивтаь анимацию при смене лейбла
   //TODO: инициализация контроллера без html
- $(function(){
+
    class AnimationHelper {
     constructor() {
 
@@ -15,15 +15,12 @@
 
       //
       this.animations = {};
-      this.$containers = $('.animator-container');
-      this.$controller = $('.animator-controller');
-
-
+      
       this.getAssetsConfig();
 
       //
       $(window).on('assets_loaded', function(e) {
-        scope.initAnimationConfig(e.detail.id);
+        // scope.initAnimationConfig(e.detail.id);
       });
 
       $(window).on("label_changed", function(e) {
@@ -38,9 +35,12 @@
 
     getAssetsConfig() {
       var scope = this;
-      if( !this.$controller ) return;
-
-      var el_data = this.$controller.data('animator');
+      $(function(){
+      scope.$containers = $('.animator-container');
+      scope.$controller = $('.animator-controller');
+      if( !scope.$controller ) return;
+  
+      var el_data = scope.$controller.data('animator');
       var animations_array = el_data.split(',');
 
       animations_array.forEach(function(x) {
@@ -49,10 +49,11 @@
           scope.animations[ _data.animation_name ] = new AnimationController( _data );
         })
       })
+    });
     }
 
 
-    initAnimationConfig(id) {
+    initAnimationConfig(id, animation_obj) {
       var scope = this;
       if ( !this.$containers ) return;
       this.$containers.each(function(i,e) {
@@ -65,14 +66,8 @@
           scope.animations[animation_name] = {
             config: container_data,
             object: obj
-          }
-          if( id == 'Trener') {
-            obj.addAnimationObject(container_data, new lib.Trener());
-          }
-          else if( id == 'Scarfman') {
-            obj.addAnimationObject(container_data, new lib.Scarfman());
-          }
-
+          };
+          obj.addAnimationObject(container_data, animation_obj);
           scope.initDebugButtons(obj, id, $e);
         }
       });
@@ -163,8 +158,8 @@
     }
   }
 
-  let animationHelper = new AnimationHelper();
+  // let animationHelper = new AnimationHelper();
 
-})
+
   
 
