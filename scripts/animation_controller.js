@@ -72,9 +72,9 @@ class AnimationController {
 
   setAnimationParameteres() {
     if ( this.animation_name != this.config.animation_name ) {
-      var event = new CustomEvent( this.ANIMATION_OBJECT_CHANGED, { detail: {new_animation_id: this.config.animation_name, prev_animation_id: this.animation_name, obj: this.animation_object}} );
+      var event = new CustomEvent( this.ANIMATION_OBJECT_CHANGED, { detail: {new_animation_id: this.config.animation_name, prev_animation_id: this.animation_name, animation: this.animation_object}} );
       window.dispatchEvent(event);
-      this.animation_name = this.config.animation_name;
+      // this.animation_name = this.config.animation_name;
     }
   	//width
   	if ( this.config.width ) this.animation_object.scaleX = this.config.width / this.animation_object.getBounds().width;
@@ -89,7 +89,7 @@ class AnimationController {
  		//label
  		if ( this.config.label_start ) this.label_start = this.config.label_start;
  		if ( this.config.label_end ) this.label_end = this.config.label_end;
-
+    else this.label_end = this.animation_object.labels[this.animation_object.labels.length - 1].label;
   	this.playFromLabel(this.label_start);//-
   }
 
@@ -106,7 +106,6 @@ class AnimationController {
 
   	var current_label;
   	var last_frame = scope.animation_object.totalFrames - 1;
-  	var last_label = this.label_end || scope.animation_object.labels[scope.animation_object.labels.length - 1].label;
   	createjs.Ticker.setFPS(this.FPS)
 		createjs.Ticker.addEventListener('tick', tick_stage)
 
@@ -125,13 +124,12 @@ class AnimationController {
       }
 
       //end of animation loop
-      if ( current_label == last_label && scope.loop_amount != scope.INFINITY) {
+      if ( current_label == scope.label_end && scope.loop_amount != scope.INFINITY) {
         if ( scope.loop_amount ) {
           scope.loop_amount--;
           if ( scope.loop_amount <= 0 ) {
             if ( scope.config.onfinish ) {
               scope.config = scope.config.onfinish;
-              last_label = scope.label_end || scope.animation_object.labels[scope.animation_object.labels.length - 1].label;
               scope.setAnimationParameteres();
               //if onfinish doesn't exist
             } else scope.animation_object.tickEnabled = false;
@@ -141,10 +139,6 @@ class AnimationController {
         } else scope.animation_object.tickEnabled = false;
       }
     }
-  }
-
-  removeAnimationObject() {
-		this.container.removeChild(this.animation_object);
   }
 
   pauseAnimation() {

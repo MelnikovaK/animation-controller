@@ -12,7 +12,8 @@
       this.CONFIG_FILE = 'config.json';
 
       //animation objects
-      this.animations = {};
+      this.containers = {};
+      this.animations_id = [];
 
       //ASSETS MANAGER
       this.AM = new AssetManager(this);
@@ -27,11 +28,21 @@
 
       $(window).on("animation_object_changed", function(e) {
         var new_id = e.detail.new_animation_id;
-        var new_animation = scope.AM.pullAsset( new_id );
-        scope.AM.pullAsset( e.detail.obj );
-        scope.animations[e.detail.prev_animation_id].object.changeAnimationObject( new_animation );
+        var prev_id = e.detail.prev_animation_id;
+        var animation_obj = scope.containers[prev_id].animation_object;
+        var animation = e.detail.animation;
+        scope.updateAnimationObject(new_id, prev_id, animation, animation_obj);
+        scope.updateAnimationSelector(new_id, prev_id);
       });
               
+    }
+
+    updateAnimationObject(new_id, prev_id, animation, obj) {
+      var new_animation = this.AM.pullAsset( new_id );
+      this.AM.pullAsset( animation );
+      obj.animation_name = new_id;
+      obj.changeAnimationObject( new_animation );
+      this.updateLabelSelector(prev_id, obj);
     }
 
     getAssetsConfig() {
@@ -45,12 +56,12 @@
         }
 
         var el_data = scope.$controller.data('animator');
-        var animations_array = el_data.split(',');
+        var containers_array = el_data.split(',');
 
-        animations_array.forEach(function(x) {
+        containers_array.forEach(function(x) {
           $.getJSON( x + scope.CONFIG_FILE, function ( _data ) {
             if( !_data ) return;
-            scope.animations[ _data.animation_name ] = new AnimationController( _data );
+            scope.containers[ _data.animation_name ] = new AnimationController( _data );
           })
         })
      });
@@ -66,23 +77,23 @@
         var container_data = $e.data('animator');
         var animation_name = container_data.animation_name;
         if ( id == animation_name ) {
-          obj = scope.animations[animation_name];
-          scope.animations[animation_name] = {
+          obj = scope.containers[animation_name];
+          scope.containers[animation_name] = {
             config: container_data,
-            object: obj
+            animation_object: obj
           };
           scope.AM.addAsset( id , function() { 
             return animation_obj;
           }, 10);
 
           obj.addAnimationObject(container_data, scope.AM.pullAsset( id ));
+          scope.animations_id.push(id);
           if (obj.ON_DEBUG) scope.initDebugButtons(obj, id, $e);
         }
       });
     }
 
     // >>> DEBUG >>>
-
     initDebugButtons(animation_obj, obj_id, $container) {
       var scope = this;
       var $debugger_container = $('<div id="debugger-container-'+ obj_id +'"></div>');
@@ -96,8 +107,7 @@
         $('<button class="close-able" id="pause-'+ obj_id +'"> Pause </button>'),
         $('<button class="close-able" id="resume-'+ obj_id +'"> Resume </button>'),
         $('<button class="close-able" id="mirrorX-'+ obj_id +'"> Mirror X </button>'),
-        $('<button class="close-able" id="mirrorY-'+ obj_id +'"> Mirror Y </button>'),
-        $('<button class="close-able" id="remove-'+ obj_id +'"> Remove </button>')
+        $('<button class="close-able" id="mirrorY-'+ obj_id +'"> Mirror Y </button>')
       ]
 
       this.debug_buttons.forEach(function(x) {
@@ -125,13 +135,24 @@
         animation_obj.mirrorY();
       });
 
-      $('#remove-' + obj_id).on('click', function() {
-        scope.AM.putAsset(animation_obj);
-        animation_obj.removeAnimationObject();
-      });
+      //ANIMATION SELECTOR 
+      var animation_selector = '<select class="close-able" id="animation-selector-'+ obj_id +'">';
+      this.animations_id.forEach(function(x) {
+        animation_selector += '<option>' + x + '</option>';
+      })
+      animation_selector += '</select>';
 
+      this.$hidden_content.append($(animation_selector));
 
-      //SELECTOR
+      this.updateAnimationSelector(obj_id, obj_id);
+    
+      $('#animation-selector-' + obj_id).change( function() {
+        var selected_label = $(this).val();
+        scope.updateAnimationObject(selected_label, obj_id, animation_obj.animation_object, animation_obj);
+        animation_obj.tickEnabled = true;
+      })
+
+      //ANIMATION LABELS SELECTOR
       var labels = animation_obj.getAnimationLabels();
       
       var labels_selector = '<select class="close-able" id="labels-selector-'+ obj_id +'">';
@@ -144,6 +165,7 @@
 
       $('#labels-selector-' + obj_id).change( function() {
         var selected_label = $(this).val();
+        animation_obj.tickEnabled = true;
         animation_obj.playFromLabel(selected_label);
       })
 
@@ -162,6 +184,19 @@
       });
 
       if ( !animation_obj.show_debug_buttons ) this.hideDebugButtons(obj_id);
+    }
+
+    updateLabelSelector(id, obj) {
+      var labels = obj.getAnimationLabels();
+      var $selector = $('#labels-selector-' + id);
+      $selector.find('option').remove();
+      labels.forEach( function(x) {
+        $selector.append($('<option>', { text: x.label}));
+      });
+    }
+
+    updateAnimationSelector(animation_id, selector_id) {
+      $('#animation-selector-' + selector_id + ' option').prop('selected', function() { return $(this).text() == animation_id; });
     }
 
     showDebugButtons(id) {
