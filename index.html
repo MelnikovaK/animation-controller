@@ -30,7 +30,7 @@
     "container_height": 300,
     "scale": "none",
     "show_debug": true, 
-    "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "stop", "loop": 1, "scale": "cover" }}'>
+    "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "stop", "loop": 1, "scale": "cover", "onfinish": { "animation_name": "Scarfman", "label_start":"sharfUp","label_end": "sharfDown", "loop": 2, "scale": "cover"}}}'>
   </div>
 
   <div id="anim2" class="animator-container" data-animator='{
@@ -40,49 +40,9 @@
     "scale": "none",
     "container_width": 300, 
     "container_height": 200,
-    "show_debug": false }'>
+    "show_debug": true }'>
   </div>
     
   </div>
 </body>
 </html>
-
-<!-- <script>
-  
-  $(function(){
-    var $element = $('.animator-controller');
-    if( !$element ) return;
-
-    $element.each(function(i,e){
-      var $e = $(e);
-      var el_data = $e.data('animator');
-      el_data = JSON.parse( el_data );
-
-      if( !el_data.assets_path ) return;
-
-      $.getJSON(function() el_data.assets_path+'config.json', function (_data) {
-        if( !_data ) return;
-          _data = Object.assign( _data, el_data );
-          new Animator( _data );
-      });  
-    });
-    
-  });
-
-
-  $('.btn').click(function(){
-    $(window).trigger('animator:play', {container:'anim1',animation:'trener',label:'start-label:end-label'});
-  });
-
-  $(window).on('animator:label-changed', function(e,data){
-    if( data.container == 'anim1' && data.prev_label == 'run'){
-      $(window).trigger('animator:play', {container:'anim1',animation:'trener',label:'start-label:end-label'});   
-    }
-  })
-
-  
-
-// bit per second
-// fps
-
-</script> -->

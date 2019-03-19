@@ -7,10 +7,12 @@ class AnimationController {
   	this.ANIMATION_FINISHED = 'animation_cycle_finished';
     this.ANIMATION_OBJECT_CHANGED = 'animation_object_changed';
 
+    //loop parameters
     this.INFINITY = 'infinity';
 
   	//DEBUGGER
   	this.show_debug_buttons = false;
+    this.ON_DEBUG = false;
 
   	this.config = animation_config;
 
@@ -38,11 +40,9 @@ class AnimationController {
 
   addAnimationObject(config, obj) {
 		this.config = Object.assign( this.config, config );
-
 		this.animation_name = this.config.animation_name;
 		this.animation_object = obj;
-
-		if ( this.config.show_debug ) this.show_debug_buttons = true;
+		if ( this.config.show_debug ) this.ON_DEBUG = true;
   }
 
   addAnimationToScreen($container) {
@@ -71,6 +71,11 @@ class AnimationController {
   }
 
   setAnimationParameteres() {
+    if ( this.animation_name != this.config.animation_name ) {
+      var event = new CustomEvent( this.ANIMATION_OBJECT_CHANGED, { detail: {new_animation_id: this.config.animation_name, prev_animation_id: this.animation_name, obj: this.animation_object}} );
+      window.dispatchEvent(event);
+      this.animation_name = this.config.animation_name;
+    }
   	//width
   	if ( this.config.width ) this.animation_object.scaleX = this.config.width / this.animation_object.getBounds().width;
   	//height
@@ -86,6 +91,12 @@ class AnimationController {
  		if ( this.config.label_end ) this.label_end = this.config.label_end;
 
   	this.playFromLabel(this.label_start);//-
+  }
+
+  changeAnimationObject(new_obj) {
+    this.container.removeChild(this.animation_object);
+    this.container.addChild(new_obj);
+    this.animation_object = new_obj;
   }
 
   playAnimation() {
@@ -118,17 +129,15 @@ class AnimationController {
         if ( scope.loop_amount ) {
           scope.loop_amount--;
           if ( scope.loop_amount <= 0 ) {
-            scope.animation_object.tickEnabled = false;
-            last_label = undefined;
             if ( scope.config.onfinish ) {
               scope.config = scope.config.onfinish;
-              scope.animation_object.tickEnabled = true;
-              scope.setAnimationParameteres();
               last_label = scope.label_end || scope.animation_object.labels[scope.animation_object.labels.length - 1].label;
-            }
-          } else {
+              scope.setAnimationParameteres();
+              //if onfinish doesn't exist
+            } else scope.animation_object.tickEnabled = false;
+          } else { // if loop amount > 0
             scope.playFromLabel(scope.label_start);
-          }        
+          } // if loop_amount doesn't exist        
         } else scope.animation_object.tickEnabled = false;
       }
     }

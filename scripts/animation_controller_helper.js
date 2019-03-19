@@ -20,11 +20,16 @@
       this.getAssetsConfig();
 
       $(window).on("label_changed", function(e) {
-        // console.log( 'Label has been changed from: ' + e.detail.previous_label + ' to: ' + e.detail.current_label );
       });
 
       $(window).on("animation_cycle_finished", function(e) {
-        // console.log( 'ANIMATION CYCLE FINISHED' );
+      });
+
+      $(window).on("animation_object_changed", function(e) {
+        var new_id = e.detail.new_animation_id;
+        var new_animation = scope.AM.pullAsset( new_id );
+        scope.AM.pullAsset( e.detail.obj );
+        scope.animations[e.detail.prev_animation_id].object.changeAnimationObject( new_animation );
       });
               
     }
@@ -66,10 +71,12 @@
             config: container_data,
             object: obj
           };
-          scope.AM.addAsset( id , function() { return animation_obj }, 10);
+          scope.AM.addAsset( id , function() { 
+            return animation_obj;
+          }, 10);
 
           obj.addAnimationObject(container_data, scope.AM.pullAsset( id ));
-          scope.initDebugButtons(obj, id, $e);
+          if (obj.ON_DEBUG) scope.initDebugButtons(obj, id, $e);
         }
       });
     }
@@ -140,12 +147,18 @@
         animation_obj.playFromLabel(selected_label);
       })
 
-      $debugger_container.append($('<button id="close'+ obj_id +'"> x </button>'));
+      $debugger_container.append($('<button id="close'+ obj_id +'"> + </button>'));
 
       $('#close' + obj_id).on('click', function() {
         animation_obj.show_debug_buttons = animation_obj.show_debug_buttons ? false : true;
-        if ( animation_obj.show_debug_buttons ) scope.showDebugButtons(obj_id);
-        else scope.hideDebugButtons(obj_id);
+        if ( animation_obj.show_debug_buttons ) { 
+          $(this).text('-');
+          scope.showDebugButtons(obj_id);
+        }
+        else {
+          $(this).text('+');
+          scope.hideDebugButtons(obj_id);
+        } 
       });
 
       if ( !animation_obj.show_debug_buttons ) this.hideDebugButtons(obj_id);
