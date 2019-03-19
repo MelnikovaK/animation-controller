@@ -86,10 +86,11 @@ class AnimationController {
  		//loop
  		if ( this.config.loop ) this.loop_amount = this.config.loop;
 
- 		//label
- 		if ( this.config.label_start ) this.label_start = this.config.label_start;
- 		if ( this.config.label_end ) this.label_end = this.config.label_end;
-    else this.label_end = this.animation_object.labels[this.animation_object.labels.length - 1].label;
+ 		//labels
+    var labels = this.animation_object.labels;
+ 		this.label_start = this.config.label_start || labels[0].label;
+ 		this.label_end = this.config.label_end || labels[labels.length - 1].label;
+
   	this.playFromLabel(this.label_start);//-
   }
 
@@ -101,11 +102,9 @@ class AnimationController {
 
   playAnimation() {
   	var scope = this;
-
   	this.FPS = this.config.fps || 25;
 
   	var current_label;
-  	var last_frame = scope.animation_object.totalFrames - 1;
   	createjs.Ticker.setFPS(this.FPS)
 		createjs.Ticker.addEventListener('tick', tick_stage)
 
@@ -117,12 +116,7 @@ class AnimationController {
         window.dispatchEvent(event);
         current_label = scope.animation_object.currentLabel;
       }
-      //finish animation cycle
-      if ( scope.animation_object.currentFrame == last_frame ) {
-        var event = new CustomEvent( scope.ANIMATION_FINISHED );
-        window.dispatchEvent(event);
-      }
-
+      
       //end of animation loop
       if ( current_label == scope.label_end && scope.loop_amount != scope.INFINITY) {
         if ( scope.loop_amount ) {
