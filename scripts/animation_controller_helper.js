@@ -32,10 +32,10 @@
         var animation_obj = scope.containers[prev_id].animation_object;
         var animation = e.detail.animation;
         scope.updateAnimationObject(new_id, prev_id, animation, animation_obj);
-        scope.updateAnimationSelector(new_id, prev_id);
       });
-              
     }
+
+    //как начать отрисовку кнопок после заполнения массива
 
     updateAnimationObject(new_id, prev_id, animation, obj) {
       var new_animation = this.AM.pullAsset( new_id );
@@ -43,6 +43,7 @@
       obj.animation_name = new_id;
       obj.changeAnimationObject( new_animation );
       this.updateLabelSelector(prev_id, obj);
+      this.updateAnimationSelector(new_id, prev_id);
     }
 
     getAssetsConfig() {
@@ -68,8 +69,9 @@
     }
 
 
-    initAnimationConfig(id, animation_obj) {
+    initAnimationConfig(id, animations) {
       var scope = this;
+      var assets_count = animations.length;
       if ( !this.$containers ) return;
       this.$containers.each(function(i,e) {
         var obj;
@@ -82,9 +84,12 @@
             config: container_data,
             animation_object: obj
           };
-          scope.AM.addAsset( id , function() { 
-            return animation_obj;
-          }, 10);
+          animations.forEach(function(x) {
+            scope.AM.addAsset( id , function() { 
+              return x;
+            }, assets_count);
+
+          })
 
           obj.addAnimationObject(container_data, scope.AM.pullAsset( id ));
           scope.animations_id.push(id);
