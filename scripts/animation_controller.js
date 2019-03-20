@@ -35,21 +35,27 @@ class AnimationController {
     	var event = new CustomEvent( scope.ASSETS_LOADED, { detail: {id: animation_config.animation_name}});
 	  	window.dispatchEvent(event);
   	}		
+
   }
 
+  addAnimationObject(config, obj, $container, animations_list) {
+		this.config = Object.assign( this.config, config )
 
-  addAnimationObject(config, obj) {
-		this.config = Object.assign( this.config, config );
+    this.$animation_cont = $container;
+    this.animations_list = animations_list;
+    this.id = this.config.canvas_id;
+
 		this.animation_name = this.config.animation_name;
 		this.animation_object = obj;
 		if ( this.config.show_debug ) this.ON_DEBUG = true;
+    if (this.ON_DEBUG) this.initDebugButtons();
   }
 
-  addAnimationToScreen($container) {
+  addAnimationToScreen() {
   	//add canvas
+    
   	var newCanvas = $('<canvas id="' + this.config.canvas_id + '"></canvas>');
-		$container.append(newCanvas);
-		this.$animation_cont = $container;
+		this.$animation_cont.append(newCanvas);
 
 		//add stage
 		var stage = this.stage = new createjs.Stage(this.config.canvas_id);
@@ -70,12 +76,16 @@ class AnimationController {
   	this.setAnimationParameteres();
   }
 
+  changeAnimation(new_id) {
+    var event = new CustomEvent( this.ANIMATION_OBJECT_CHANGED, { detail: {new_animation_id: new_id, prev_animation_id: this.animation_name, animation: this.animation_object, obj: this}} );
+    window.dispatchEvent(event);
+    this.animation_name = new_id;
+    this.updateLabelSelector(this.animation_name);
+    this.updateAnimationSelector(this.animation_name);
+  }
+
   setAnimationParameteres() {
-    if ( this.animation_name != this.config.animation_name ) {
-      var event = new CustomEvent( this.ANIMATION_OBJECT_CHANGED, { detail: {new_animation_id: this.config.animation_name, prev_animation_id: this.animation_name, animation: this.animation_object}} );
-      window.dispatchEvent(event);
-      this.animation_name = this.config.animation_name;
-    }
+    if ( this.animation_name != this.config.animation_name ) this.changeAnimation(this.config.animation_name);
   	//width
   	if ( this.config.width ) this.animation_object.scaleX = this.config.width / this.animation_object.getBounds().width;
   	//height
@@ -157,6 +167,128 @@ class AnimationController {
 
   playFromLabel(label,label_end,loop,onComplete) {
   	this.animation_object.gotoAndPlay(label);
+  }
+
+  // >>> DEBUG >>>
+
+  initDebugButtons() {
+    var scope = this;
+    var $debugger_container = $('<div id="debugger-container-'+ this.id +'"></div>');
+    this.$animation_cont.append($debugger_container);
+
+    this.$hidden_content = $('<div id="hidden-content-'+ this.id +'"></div>');
+    $debugger_container.append(this.$hidden_content);
+
+    //BUTTONS
+    this.debug_buttons = [
+      $('<button class="close-able" id="add-'+ this.id +'"> Add </button>'),
+      $('<button class="close-able" id="play-'+ this.id +'"> Play </button>'),
+      $('<button class="close-able" id="pause-'+ this.id +'"> Pause </button>'),
+      $('<button class="close-able" id="resume-'+ this.id +'"> Resume </button>'),
+      $('<button class="close-able" id="mirrorX-'+ this.id +'"> Mirror X </button>'),
+      $('<button class="close-able" id="mirrorY-'+ this.id +'"> Mirror Y </button>')
+    ]
+
+    this.debug_buttons.forEach(function(x) {
+      scope.$hidden_content.append(x);
+    });
+
+    $('#add-' + this.id).one('click', function() {
+      scope.addAnimationToScreen();
+    });
+
+    $('#play-' + this.id).one('click', function() {
+      scope.playAnimation();
+    });
+
+    $('#pause-' + this.id).on('click', function() {
+      scope.pauseAnimation();
+    });
+
+    $('#resume-' + this.id).on('click', function() {
+      scope.resumeAnimation();
+    });
+
+    $('#mirrorX-' + this.id).on('click', function() {
+      scope.mirrorX();
+    });
+
+    $('#mirrorY-' + this.id).on('click', function() {
+      scope.mirrorY();
+    });
+
+    //ANIMATION SELECTOR 
+    var animation_selector = '<select class="close-able" id="animation-selector-'+ this.id +'">';
+    this.animations_list.forEach(function(x) {
+      animation_selector += '<option>' + x + '</option>';
+    })
+    animation_selector += '</select>';
+
+    this.$hidden_content.append($(animation_selector));
+
+    this.updateAnimationSelector(this.animation_name);
+  
+    $('#animation-selector-' + this.id).change( function() {
+      if ( !scope.container ) return;
+      var selected_label = $(this).val();
+      scope.tickEnabled = true;
+      scope.changeAnimation(selected_label);
+    })
+
+
+    //ANIMATION LABELS SELECTOR
+    var labels = scope.getAnimationLabels();
+    
+    var labels_selector = '<select class="close-able" id="labels-selector-'+ this.id +'">';
+    labels.forEach(function(x) {
+      labels_selector += '<option>' + x.label + '</option>';
+    })
+    labels_selector += '</select>';
+
+    this.$hidden_content.append($(labels_selector));
+
+    $('#labels-selector-' + this.id).change( function() {
+      var selected_label = $(this).val();
+      scope.tickEnabled = true;
+      scope.playFromLabel(selected_label);
+    })
+
+    $debugger_container.append($('<button id="close'+ this.id +'"> + </button>'));
+
+    $('#close' + this.id).on('click', function() {
+      scope.show_debug_buttons = scope.show_debug_buttons ? false : true;
+      if ( scope.show_debug_buttons ) { 
+        $(this).text('-');
+        scope.showDebugButtons();
+      }
+      else {
+        $(this).text('+');
+        scope.hideDebugButtons();
+      } 
+    });
+
+    if ( !scope.show_debug_buttons ) this.hideDebugButtons(this.id);
+  }
+
+  updateLabelSelector() {
+    var labels = this.getAnimationLabels();
+    var $selector = $('#labels-selector-' + this.id);
+    $selector.find('option').remove();
+    labels.forEach( function(x) {
+      $selector.append($('<option>', { text: x.label}));
+    });
+  }
+
+  updateAnimationSelector(animation_id) {
+    $('#animation-selector-' + this.id + ' option').prop('selected', function() { return $(this).text() == animation_id; });
+  }
+
+  showDebugButtons() {
+    $('#hidden-content-' + this.id).css({'width': 'auto', 'height': 'auto'});
+  }
+
+  hideDebugButtons() {
+    $('#hidden-content-' + this.id).css({'width': 0, 'height': 0, 'overflow': 'hidden'});
   }
 }
     
