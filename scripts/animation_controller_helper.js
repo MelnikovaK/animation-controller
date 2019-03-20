@@ -39,7 +39,7 @@
 
     updateAnimationObject(new_id, prev_id, animation, obj) {
       var new_animation = this.AM.pullAsset( new_id );
-      this.AM.pullAsset( animation );
+      this.AM.putAsset( animation );
       obj.animation_name = new_id;
       obj.changeAnimationObject( new_animation );
       this.updateLabelSelector(prev_id, obj);
@@ -85,12 +85,8 @@
             animation_object: obj
           };
           animations.forEach(function(x) {
-            scope.AM.addAsset( id , function() { 
-              return x;
-            }, assets_count);
-
+            scope.AM.addAsset( id , function() { return x; }, 1);
           })
-
           obj.addAnimationObject(container_data, scope.AM.pullAsset( id ));
           scope.animations_id.push(id);
           if (obj.ON_DEBUG) scope.initDebugButtons(obj, id, $e);
