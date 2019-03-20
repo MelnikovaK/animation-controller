@@ -1,7 +1,3 @@
-  // Отрисовка контейнера должна происходить только при работающей анимации  +
-  // Нужен АссетМенеджер для хранения созданных экземплеров анимаций  +
-
-
   //TODO: инициализация контроллера без html
    class AnimationHelper {
     constructor() {
@@ -13,7 +9,9 @@
 
       //animation objects
       this.containers = {};
-      this.animations_id = [];
+
+      this.animations_set = new Set();
+      
 
       //ASSETS MANAGER
       this.AM = new AssetManager(this);
@@ -38,7 +36,6 @@
     updateAnimationObject(new_id, prev_id, animation, obj) {
       var new_animation = this.AM.pullAsset( new_id );
       this.AM.putAsset( animation );
-      obj.animation_name = new_id;
       obj.changeAnimationObject( new_animation );
       this.updateLabelSelector(prev_id, obj);
       this.updateAnimationSelector(new_id, prev_id);
@@ -51,55 +48,55 @@
         scope.$controller = $('.animator-controller');
 
         if( !scope.$controller ) {
-          scope.$container = $('<div class="animator-controller"></div>')
+          scope.$controller = $('<div class="animator-controller"></div>')
         }
 
         var el_data = scope.$controller.data('animator');
         var containers_array = el_data.split(',');
-
-        containers_array.forEach(function(x) {
-          $.getJSON( x + scope.CONFIG_FILE, function ( _data ) {
-            if( !_data ) return;
-            scope.containers[ _data.animation_name ] = new AnimationController( _data );
-          })
-        })
+        if ( containers_array )
+        {
+          containers_array.forEach(function(x) {
+            $.getJSON( x + scope.CONFIG_FILE, function ( _data ) {
+              if( !_data ) return;
+              scope.containers[ _data.animation_name ] = new AnimationController( _data );
+            })
+          })  
+        }
      });
     }
 
 
     initAnimationConfig(id, animations) {
       var scope = this;
-      var assets_count = animations.length;
       if ( !this.$containers ) return;
+      var animation_obj;
       this.$containers.each(function(i,e) {
-        var obj;
         var $e = $(e);
         var container_data = $e.data('animator');
         var animation_name = container_data.animation_name;
+        //adding animation name for selector
+        scope.animations_set.add(animation_name);
         if ( id == animation_name ) {
-          obj = scope.containers[animation_name];
+          animation_obj = scope.containers[animation_name];
           scope.containers[animation_name] = {
             config: container_data,
-            animation_object: obj,
+            animation_object: animation_obj,
             $container_element: $e
           };
           animations.forEach(function(x) {
             scope.AM.addAsset( id , function() { return x; }, 1);
           })
-          obj.addAnimationObject(container_data, scope.AM.pullAsset( id ));
-          scope.animations_id.push(animation_name);
-          if (obj.ON_DEBUG) scope.initDebugButtons(obj, id, $e);
+          animation_obj.addAnimationObject(container_data, scope.AM.pullAsset( id ));
         }
       });
-      // this.animations_id.forEach( function(x) {
-      //   var container = scope.containers[x];
-      //   if (container.animation_object.ON_DEBUG) scope.initDebugButtons(container.animation_object, x, container.$container_element);
-      // })
+      //init buttons
+      var container = this.containers[id];
+      if (container.animation_object.ON_DEBUG) scope.initDebugButtons(animation_obj, id, container.$container_element);
+      
     }
 
     // >>> DEBUG >>>
     initDebugButtons(animation_obj, obj_id, $container) {
-      console.log('here')
       var scope = this;
       var $debugger_container = $('<div id="debugger-container-'+ obj_id +'"></div>');
       $container.append($debugger_container);
@@ -108,6 +105,7 @@
 
       //BUTTONS
       this.debug_buttons = [
+        $('<button class="close-able" id="add-'+ obj_id +'"> Add </button>'),
         $('<button class="close-able" id="play-'+ obj_id +'"> Play </button>'),
         $('<button class="close-able" id="pause-'+ obj_id +'"> Pause </button>'),
         $('<button class="close-able" id="resume-'+ obj_id +'"> Resume </button>'),
@@ -119,8 +117,11 @@
         scope.$hidden_content.append(x);
       });
 
-      $('#play-' + obj_id).one('click', function() {
+      $('#add-' + obj_id).one('click', function() {
         animation_obj.addAnimationToScreen($container);
+      });
+
+      $('#play-' + obj_id).one('click', function() {
         animation_obj.playAnimation();
       });
 
@@ -142,7 +143,7 @@
 
       //ANIMATION SELECTOR 
       var animation_selector = '<select class="close-able" id="animation-selector-'+ obj_id +'">';
-      this.animations_id.forEach(function(x) {
+      this.animations_set.forEach(function(x) {
         animation_selector += '<option>' + x + '</option>';
       })
       animation_selector += '</select>';
@@ -152,10 +153,12 @@
       this.updateAnimationSelector(obj_id, obj_id);
     
       $('#animation-selector-' + obj_id).change( function() {
+        if ( !animation_obj.container ) return;
         var selected_label = $(this).val();
         scope.updateAnimationObject(selected_label, obj_id, animation_obj.animation_object, animation_obj);
         animation_obj.tickEnabled = true;
       })
+
 
       //ANIMATION LABELS SELECTOR
       var labels = animation_obj.getAnimationLabels();
@@ -212,7 +215,3 @@
       $('#hidden-content-' + id).css({'width': 0, 'height': 0, 'overflow': 'hidden'});
     }
   }
-
-
-  
-

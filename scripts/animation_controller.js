@@ -16,7 +16,6 @@ class AnimationController {
 
   	this.config = animation_config;
 
-
   	this.preloadAssets(animation_config);
   }
 
@@ -75,7 +74,7 @@ class AnimationController {
     if ( this.animation_name != this.config.animation_name ) {
       var event = new CustomEvent( this.ANIMATION_OBJECT_CHANGED, { detail: {new_animation_id: this.config.animation_name, prev_animation_id: this.animation_name, animation: this.animation_object}} );
       window.dispatchEvent(event);
-      // this.animation_name = this.config.animation_name;
+      this.animation_name = this.config.animation_name;
     }
   	//width
   	if ( this.config.width ) this.animation_object.scaleX = this.config.width / this.animation_object.getBounds().width;
