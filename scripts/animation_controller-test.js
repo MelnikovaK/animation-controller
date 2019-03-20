@@ -13,4 +13,6 @@
     }
     animationHelper.initAnimationConfig(id, animations);
   });
+
+  
  });
