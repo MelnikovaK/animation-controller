@@ -1,81 +1,99 @@
 //TODO: инициализация контроллера без html
+/*
+  если нет контроллера то мы его создаем сами 
+*/
 class AnimationHelper {
   constructor() {
     var scope = this;
 
     //CONSTANTS
+    this.ASSETS_LOADED = 'assets_loaded';
     this.CONFIG_FILE = 'config.json';
 
-    //animation objects
-    this.containers = {};
-
-    this.animations_set = new Set();
+    //data
+    this.data = {};
     
     //ASSETS MANAGER
     this.AM = new AssetManager(this);
     
-    this.getAssetsConfig();
+    this.initContainersConfig();
 
     $(window).on("animation_object_changed", function(e) {
-      var new_animation_name = e.detail.new_animation_id;
       var obj = e.detail.obj;
-      var animation = e.detail.animation;
-      scope.updateAnimationObject(new_animation_name, animation, obj);
+      var new_animation = scope.AM.pullAsset( e.detail.new_animation_id );
+      scope.AM.putAsset( e.detail.animation );
+      obj.changeAnimationObject( new_animation );
     });
   }
 
-  updateAnimationObject(new_id, animation, obj) {
-    var new_animation = this.AM.pullAsset( new_id );
-    this.AM.putAsset( animation );
-    obj.changeAnimationObject( new_animation );
-  }
-
-  getAssetsConfig() {
+  initContainersConfig() {
     var scope = this;
     $(function(){
       scope.$containers = $('.animator-container');
       scope.$controller = $('.animator-controller');
 
-      if( !scope.$controller ) {
+      if( !scope.$controller.length ) {
+        var animations_array = [];
         scope.$controller = $('<div class="animator-controller"></div>')
+        scope.$containers.each(function(i, e) {
+          scope.$controller.wrapAll($(e));
+          // animations_array.push($(e).data('animator').config);
+        })
+      } else {
+        var el_data = scope.$controller.data('animator');
+        var animations_array = el_data.split(',');   
       }
-      var el_data = scope.$controller.data('animator');
-      var containers_array = el_data.split(',');
-      if ( containers_array )
-      {
-        containers_array.forEach(function(x) {
-          $.getJSON( x + scope.CONFIG_FILE, function ( _data ) {
-            if( !_data ) return;
-            scope.containers[ _data.animation_name ] = new AnimationController( _data );
-          })
-        })  
-      }
-   });
+
+      scope.getAssetsConfig(animations_array);
+    });
   }
 
-  initAnimationConfig(id, animations) {
+  getAssetsConfig(animations_array) {
     var scope = this;
-    if ( !this.$containers ) return;
-    var animation_obj, container;
-    this.$containers.each(function(i,e) {
-      var $e = $(e);
-      var container_data = $e.data('animator');
-      var animation_name = container_data.animation_name;
-      //adding animation name for selector
-      scope.animations_set.add(animation_name);
-      if ( id == animation_name ) {
-        container = $e;
-        animation_obj = scope.containers[animation_name];
-        scope.containers[animation_name] = {
-          config: container_data,
-          animation_object: animation_obj,
-          $container_element: $e
-        };
-        animations.forEach(function(x) {
-          scope.AM.addAsset( id , function() { return x; }, 1);
+    if ( animations_array ) {
+      animations_array.forEach(function(x, i) {
+        $.getJSON( x + scope.CONFIG_FILE, function ( _data ) {
+          if( !_data ) return;
+          scope.data[ _data.animation_name ] = scope.data;
+          scope.preloadAssets(_data, animations_array.length - i - 1)
         })
+      })  
+    }
+  }
+
+
+  preloadAssets(animation_config, assets_rem) {
+    var scope = this;
+    var loader = new createjs.LoadQueue(false);
+    loader.addEventListener("fileload", handleFileLoad);
+    loader.addEventListener("complete", handleComplete);
+    loader.loadManifest(animation_config.manifest);
+
+    function handleFileLoad(evt) {
+      if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
+    }
+
+    function handleComplete() {
+      if ( assets_rem == 0 ) {
+        var event = new CustomEvent( scope.ASSETS_LOADED, { detail: {id: animation_config.animation_name}});
+        window.dispatchEvent(event);
       }
-    });
-    animation_obj.addAnimationObject(scope.containers[id].config, scope.AM.pullAsset( id ), container, scope.animations_set);
-  } 
+    }   
+  }
+
+  initAnimationsContainers(animations_by_id, ids) {
+    var scope = this;
+    this.$containers.each(function(i,e) {
+      var container_data = $(e).data('animator');
+      var animation_name = container_data.animation_name;
+
+      var animation_controller = new AnimationController(scope.data[animation_name]);
+
+      animations_by_id[animation_name].forEach(function(x) {
+        scope.AM.addAsset( animation_name , function() { return x; }, 1);
+      })
+
+      animation_controller.addAnimationObject(container_data, scope.AM.pullAsset( animation_name ), $(e), ids);
+    })
+  }
 }

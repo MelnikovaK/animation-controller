@@ -1,8 +1,7 @@
 class AnimationController {
 
-  constructor(animation_config) {
+  constructor(config) {
   	//CONSTANTS
-  	this.ASSETS_LOADED = 'assets_loaded';
   	this.LABEL_CHANGED = 'label_changed';
   	this.ANIMATION_FINISHED = 'animation_cycle_finished';
     this.ANIMATION_OBJECT_CHANGED = 'animation_object_changed';
@@ -11,36 +10,15 @@ class AnimationController {
     this.INFINITY = 'infinity';
 
   	//DEBUGGER
-  	this.show_debug_buttons = false;
+  	this.show_debug_buttons = true;
     this.ON_DEBUG = false;
 
-  	this.config = animation_config;
-
-  	this.preloadAssets(animation_config);
+    this.config = config;
   }
 
- preloadAssets(animation_config) {
-  	var scope = this;
-  	var loader = new createjs.LoadQueue(false);
-		loader.addEventListener("fileload", handleFileLoad);
-		loader.addEventListener("complete", handleComplete);
-		loader.loadManifest(animation_config.manifest);
-
-		function handleFileLoad(evt) {
-			if (evt.item.type == "image") { images[evt.item.id] = evt.result; }
-		}
-
-		//init stage
-		function handleComplete() {
-    	var event = new CustomEvent( scope.ASSETS_LOADED, { detail: {id: animation_config.animation_name}});
-	  	window.dispatchEvent(event);
-  	}		
-
-  }
 
   addAnimationObject(config, obj, $container, animations_list) {
-		this.config = Object.assign( this.config, config )
-
+		this.config = Object.assign(config, this.config);
     this.$animation_cont = $container;
     this.animations_list = animations_list;
     this.id = this.config.canvas_id;
@@ -140,7 +118,11 @@ class AnimationController {
           } else { // if loop amount > 0
             scope.playFromLabel(scope.label_start);
           } // if loop_amount doesn't exist        
-        } else scope.animation_object.tickEnabled = false;
+        } else {
+          scope.animation_object.tickEnabled = false;
+          var event = new CustomEvent( scope.ANIMATION_FINISHED);
+          window.dispatchEvent(event);
+        }
       }
     }
   }

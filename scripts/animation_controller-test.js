@@ -1,18 +1,23 @@
  $(function(){
   let animationHelper = new AnimationHelper();
+  var animations_by_id = {}
 
-  var animations_by_id = {};
+  var TRENER = 'Trener';
+  var SCARFMAN = 'Scarfman';
   
+  var animations_id = [ TRENER, SCARFMAN ]
   //send animation object
   $(window).on('assets_loaded', function(e) {
-    var animations = [];
-    var id = e.detail.id;
+    var trener_animations = [];
+    var scarfman_animations = [];
     for ( var i = 0; i < 10; i++ ) {
-      if ( id == 'Trener') animations.push(new lib.Trener());
-      if ( id == 'Scarfman') animations.push(new lib.Scarfman());
+      trener_animations.push(new lib.Trener());
+      scarfman_animations.push(new lib.Scarfman());
     }
-    animationHelper.initAnimationConfig(id, animations);
+    animations_by_id[TRENER] = trener_animations;
+    animations_by_id[SCARFMAN] = scarfman_animations;
+    animationHelper.initAnimationsContainers(animations_by_id, animations_id);
   });
 
-  
+
  });
