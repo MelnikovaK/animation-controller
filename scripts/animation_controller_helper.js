@@ -35,8 +35,6 @@
       });
     }
 
-    //как начать отрисовку кнопок после заполнения массива
-
     updateAnimationObject(new_id, prev_id, animation, obj) {
       var new_animation = this.AM.pullAsset( new_id );
       this.AM.putAsset( animation );
@@ -82,20 +80,26 @@
           obj = scope.containers[animation_name];
           scope.containers[animation_name] = {
             config: container_data,
-            animation_object: obj
+            animation_object: obj,
+            $container_element: $e
           };
           animations.forEach(function(x) {
             scope.AM.addAsset( id , function() { return x; }, 1);
           })
           obj.addAnimationObject(container_data, scope.AM.pullAsset( id ));
-          scope.animations_id.push(id);
+          scope.animations_id.push(animation_name);
           if (obj.ON_DEBUG) scope.initDebugButtons(obj, id, $e);
         }
       });
+      // this.animations_id.forEach( function(x) {
+      //   var container = scope.containers[x];
+      //   if (container.animation_object.ON_DEBUG) scope.initDebugButtons(container.animation_object, x, container.$container_element);
+      // })
     }
 
     // >>> DEBUG >>>
     initDebugButtons(animation_obj, obj_id, $container) {
+      console.log('here')
       var scope = this;
       var $debugger_container = $('<div id="debugger-container-'+ obj_id +'"></div>');
       $container.append($debugger_container);

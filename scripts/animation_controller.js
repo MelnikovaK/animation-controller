@@ -16,6 +16,7 @@ class AnimationController {
 
   	this.config = animation_config;
 
+
   	this.preloadAssets(animation_config);
   }
 

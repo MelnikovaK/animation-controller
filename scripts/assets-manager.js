@@ -19,8 +19,7 @@ class AssetManager {
         createAsset: createAsset
       }
     }
-
-    console.log(this.asset_entities[id].assets[0] == this.asset_entities[id].assets[1])
+    
     var a = [];
     for( var i=0; i< pregenerate_amount; i++ ){
       a.push( this.pullAsset( id, true ) );
