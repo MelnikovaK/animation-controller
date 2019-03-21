@@ -1,4 +1,5 @@
 //TODO: инициализация контроллера без html
+//TODO: кнопка + не должна менять размер
 //TODO: передача массива со списком загруженных анимаций
 //!!!не заводить массивы контейнеров а обеспечить работу с ними через события
   $(function(){
@@ -43,7 +44,6 @@ class AnimatorController {
         })
       });  
     }
-
 
   preloadAssets(animation_config, assets_rem) {
     var scope = this;

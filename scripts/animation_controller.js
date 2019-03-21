@@ -10,7 +10,7 @@ class AnimatorContainer {
     this.INFINITY = 'infinity';
 
   	//DEBUGGER
-  	this.show_debug_buttons = false;
+  	this.show_debug_buttons = true;
     this.ON_DEBUG = false;
 
     this.config = config;
@@ -49,12 +49,12 @@ class AnimatorContainer {
     this.container.addChild(this.animation_object);
     stage.update();
 
-    this.setAnimationParameteres();
 
 		//debug
     this.id = this.config.canvas_id;
 		if ( this.config.show_debug ) this.ON_DEBUG = true;
     if (this.ON_DEBUG) this.initDebugButtons();
+    else this.setAnimationParameteres();
 
     //play
     this.playAnimation();
@@ -136,6 +136,7 @@ class AnimatorContainer {
   }
 
   pauseAnimation() {
+    console.log(this.animation_object)
   	this.animation_object.tickEnabled = false;
   }
 
@@ -160,41 +161,74 @@ class AnimatorContainer {
   }
 
   // >>> DEBUG >>>
-
   initDebugButtons() {
     var scope = this;
-    var $debugger_container = $('<div id="debugger-container-'+ this.id +'"></div>');
-    console.log(this.$animation_cont)
-    this.$animation_cont.append($debugger_container);
+    var $debugger_container = $('<div class="debugger-container" id="debugger-container-'+ this.id +'"></div>');
+    this.$animation_cont.prepend($debugger_container);
 
-    this.$hidden_content = $('<div id="hidden-content-'+ this.id +'"></div>');
-    $debugger_container.append(this.$hidden_content);
+    //CLOSE BUTTON
+    $debugger_container.append($('<button class="close-btn" id="close'+ this.id +'">+</button>'));
+
+    $('#close' + this.id).on('click', function() {
+      $(this).text( $(this).text() == '+' ? '-' : '+' );
+      $('#hidden-able-content-' + scope.id).toggleClass('hidden-able-content_hide', $(this).text() == '-')
+    });
+
+    //CONTAINER FOR ELEMENTS WHICH CAN BE HIDDEN
+    var $hidden_able_content = $('<div class="hidden-able-content" id="hidden-able-content-'+ this.id +'"></div>');
+    $debugger_container.append($hidden_able_content);
+
+    //ANIMATION SELECTOR 
+    var animation_selector = '<select class="close-able" id="animation-selector-'+ this.id +'">';
+    this.animations_list.forEach(function(x) {
+      animation_selector += '<option>' + x + '</option>';
+    })
+    animation_selector += '</select>';
+
+    $hidden_able_content.append($(animation_selector));
+
+    this.updateAnimationSelector(this.animation_name);
+  
+    $('#animation-selector-' + this.id).change( function() {
+      if ( !scope.container ) return;
+      var selected_label = $(this).val();
+      scope.tickEnabled = true;
+      scope.changeAnimation(selected_label);
+    })
+
+    //ANIMATION LABELS SELECTOR
+    var labels = scope.getAnimationLabels();
+    
+    var labels_selector = '<select class="close-able" id="labels-selector-'+ this.id +'">';
+    labels.forEach(function(x) {
+      labels_selector += '<option>' + x.label + '</option>';
+    })
+    labels_selector += '</select>';
+
+    $hidden_able_content.append($(labels_selector));
+
+    $('#labels-selector-' + this.id).change( function() {
+      var selected_label = $(this).val();
+      scope.tickEnabled = true;
+      scope.playFromLabel(selected_label);
+    })
+
 
     //BUTTONS
     this.debug_buttons = [
-      $('<button class="close-able" id="play-'+ this.id +'"> Play </button>'),
-      $('<button class="close-able" id="pause-'+ this.id +'"> Pause </button>'),
-      $('<button class="close-able" id="resume-'+ this.id +'"> Resume </button>'),
+      $('<button class="close-able" id="play-'+ this.id +'">pause</button>'),
       $('<button class="close-able" id="mirrorX-'+ this.id +'"> Mirror X </button>'),
       $('<button class="close-able" id="mirrorY-'+ this.id +'"> Mirror Y </button>')
     ]
 
     this.debug_buttons.forEach(function(x) {
-      scope.$hidden_content.append(x);
+      $hidden_able_content.append(x);
     });
 
-    $('#play-' + this.id).one('click', function() {
-      if ( !scope.container ) return;
-    });
-
-    $('#pause-' + this.id).on('click', function() {
-      if ( !scope.container ) return;
-      scope.pauseAnimation();
-    });
-
-    $('#resume-' + this.id).on('click', function() {
-      if ( !scope.container ) return;
-      scope.resumeAnimation();
+    $('#play-' + this.id).on('click', function() {
+      if ($(this).text() == 'play') scope.resumeAnimation();
+      else scope.pauseAnimation();
+      $(this).text( $(this).text() == 'play' ? 'pause' : 'play' );
     });
 
     $('#mirrorX-' + this.id).on('click', function() {
@@ -207,55 +241,10 @@ class AnimatorContainer {
       scope.mirrorY();
     });
 
-    //ANIMATION SELECTOR 
-    var animation_selector = '<select class="close-able" id="animation-selector-'+ this.id +'">';
-    this.animations_list.forEach(function(x) {
-      animation_selector += '<option>' + x + '</option>';
-    })
-    animation_selector += '</select>';
-
-    this.$hidden_content.append($(animation_selector));
-
-    this.updateAnimationSelector(this.animation_name);
-  
-    $('#animation-selector-' + this.id).change( function() {
-      if ( !scope.container ) return;
-      var selected_label = $(this).val();
-      scope.tickEnabled = true;
-      scope.changeAnimation(selected_label);
-    })
 
 
-    //ANIMATION LABELS SELECTOR
-    var labels = scope.getAnimationLabels();
-    
-    var labels_selector = '<select class="close-able" id="labels-selector-'+ this.id +'">';
-    labels.forEach(function(x) {
-      labels_selector += '<option>' + x.label + '</option>';
-    })
-    labels_selector += '</select>';
 
-    this.$hidden_content.append($(labels_selector));
 
-    $('#labels-selector-' + this.id).change( function() {
-      var selected_label = $(this).val();
-      scope.tickEnabled = true;
-      scope.playFromLabel(selected_label);
-    })
-
-    $debugger_container.append($('<button id="close'+ this.id +'"> + </button>'));
-
-    $('#close' + this.id).on('click', function() {
-      scope.show_debug_buttons = scope.show_debug_buttons ? false : true;
-      if ( scope.show_debug_buttons ) { 
-        $(this).text('-');
-        scope.showDebugButtons();
-      }
-      else {
-        $(this).text('+');
-        scope.hideDebugButtons();
-      } 
-    });
 
     if ( !scope.show_debug_buttons ) this.hideDebugButtons(this.id);
   }
@@ -271,14 +260,6 @@ class AnimatorContainer {
 
   updateAnimationSelector(animation_id) {
     $('#animation-selector-' + this.id + ' option').prop('selected', function() { return $(this).text() == animation_id; });
-  }
-
-  showDebugButtons() {
-    $('#hidden-content-' + this.id).css({'width': 'auto', 'height': 'auto'});
-  }
-
-  hideDebugButtons() {
-    $('#hidden-content-' + this.id).css({'width': 0, 'height': 0, 'overflow': 'hidden'});
   }
 }
     
