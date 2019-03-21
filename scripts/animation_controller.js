@@ -98,11 +98,10 @@ class AnimatorContainer {
   playAnimation() {
   	var scope = this;
   	this.FPS = this.config.fps || 25;
-
+    var stop_animation_on_next_step = false;
   	var current_label;
   	createjs.Ticker.setFPS(this.FPS)
-		createjs.Ticker.addEventListener('tick', tick_stage)
-
+		createjs.Ticker.addEventListener('tick', tick_stage);
     function tick_stage() {
       scope.stage.update();
       //label changed
@@ -110,27 +109,28 @@ class AnimatorContainer {
         var event = new CustomEvent( scope.LABEL_CHANGED, { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
         window.dispatchEvent(event);
         current_label = scope.animation_object.currentLabel;
-      }
-      
-      //end of animation loop
-      if ( current_label == scope.label_end && scope.loop_amount != scope.INFINITY) {
-        if ( scope.loop_amount ) {
-          scope.loop_amount--;
-          if ( scope.loop_amount <= 0 ) {
-            if ( scope.config.onfinish ) {
-              scope.config = scope.config.onfinish;
-              scope.setAnimationParameteres();
-              //if onfinish doesn't exist
-            } else scope.animation_object.tickEnabled = false;
-          } else { // if loop amount > 0
-            scope.playFromLabel(scope.label_start);
-          } // if loop_amount doesn't exist        
-        } else {
-          scope.animation_object.tickEnabled = false;
-          var event = new CustomEvent( scope.ANIMATION_FINISHED);
-          window.dispatchEvent(event);
+        if ( stop_animation_on_next_step ) {
+          if ( scope.loop_amount ) {
+            scope.loop_amount--;
+            if ( scope.loop_amount <= 0 ) {
+              if ( scope.config.onfinish ) {
+                scope.config = scope.config.onfinish;
+                scope.setAnimationParameteres();
+                //if onfinish doesn't exist
+              } else scope.animation_object.tickEnabled = false;
+            } else { // if loop amount > 0
+              scope.playFromLabel(scope.label_start);
+            } // if loop_amount doesn't exist        
+          } else {
+            scope.animation_object.tickEnabled = false;
+            var event = new CustomEvent( scope.ANIMATION_FINISHED);
+            window.dispatchEvent(event);
+          }
+          stop_animation_on_next_step = false;
         }
       }
+
+      if (current_label == scope.label_end && scope.loop_amount != scope.INFINITY) stop_animation_on_next_step = true;
     }
   }
 
@@ -206,7 +206,6 @@ class AnimatorContainer {
     //FINISH LABELS SELECTOR
     createLabelsSelector($hidden_able_content, 'close-able', 'finish-labels-selector-'+ this.id );
     $('#finish-labels-selector-' + this.id).change( function() {
-      console.log(scope.label_end)
       scope.label_end = $(this).val();
     })
 
