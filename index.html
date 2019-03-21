@@ -16,33 +16,32 @@
   <script type="text/javascript" src="scripts/animation_controller.js"></script>
   <script type="text/javascript" src="scripts/animation_controller_helper.js"></script>
   <script type="text/javascript" src="scripts/assets-manager.js"></script>
-  <script type="text/javascript" src="scripts/animation_controller-test.js"></script>
   
   <div class="animator-controller" data-animator='assets/trener/, assets/scarfman/'>
   
-  <div id="anim1" class="animator-container" data-animator='{
-    "canvas_id":"1",
-    "animation_name": "Trener", 
-    "label_start": "Clocks",
-    "label_end": "Static",
-    "loop": 2, 
-    "container_width": 300, 
-    "container_height": 300,
-    "scale": "none",
-    "show_debug": true, 
-    "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "static", "loop": 1, "scale": "cover", "onfinish": { "animation_name": "Scarfman", "label_start":"sharfUp","label_end": "sharfDown", "loop": 2, "scale": "cover"}}}'>
-  </div>
+    <div id="anim1" class="animator-container" data-animator='{
+      "canvas_id":"1",
+      "animation_name": "Trener", 
+      "label_start": "Clocks",
+      "label_end": "Static",
+      "loop": 2, 
+      "container_width": 300, 
+      "container_height": 300,
+      "scale": "none",
+      "show_debug": true, 
+      "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "static", "loop": 1, "scale": "cover", "onfinish": { "animation_name": "Scarfman", "label_start":"sharfUp","label_end": "sharfDown", "loop": 2, "scale": "cover"}}}'>
+    </div>
 
-  <div id="anim2" class="animator-container" data-animator='{
-    "canvas_id":"2",
-    "animation_name": "Scarfman",
-    "loop": "1",
-    "scale": "none",
-    "container_width": 300, 
-    "container_height": 200,
-    "show_debug": true,
-    "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "static", "loop": 7, "scale": "cover"} }'>
-  </div>    
+    <div id="anim2" class="animator-container" data-animator='{
+      "canvas_id":"2",
+      "animation_name": "Scarfman",
+      "loop": "1",
+      "scale": "contain",
+      "container_width": 300, 
+      "container_height": 200,
+      "show_debug": false,
+      "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "static", "loop": 7, "scale": "none"} }'>
+    </div>    
   </div>
 
   <!-- <div id="anim1" class="animator-container" data-animator='{
@@ -70,6 +69,33 @@
     "show_debug": true,
     "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "static", "loop": 7, "scale": "cover"} }'>
   </div>   -->
+  
+<!--   <script>
+    
+    var animator = new Animator();
+
+    animator.loadAsset(['assets/trener/','assets/scarfman/']);
+
+    var animation_container = animator.createContainer( $element, {
+      "canvas_id":"2",
+      "animation_name": "Scarfman",
+      "loop": "1",
+      "scale": "contain",
+      "container_width": 300, 
+      "container_height": 200,
+      "show_debug": true,
+      "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "static", "loop": 7, "scale": "none"} }
+    );
+    
+    animation_container.play('Trener', 'Zevanie', function(){
+
+    });
+
+    animator.loadAsset('assets/players', function(){
+      console.log('players is loaded');
+    });
+
+  </script> -->
 
 </body>
 </html>

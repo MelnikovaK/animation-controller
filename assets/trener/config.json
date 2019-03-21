@@ -1,6 +1,6 @@
 {
     "fps": 25,
-    "scale": 0.5,
+    "scale": 1,
     "width": 110,
     "height": 200,
     "animation": {"src": "assets/trener/trener.js"},

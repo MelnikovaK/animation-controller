@@ -1,6 +1,6 @@
-class AnimationController {
+class AnimatorContainer {
 
-  constructor(config) {
+  constructor(config, animation, $container) {
   	//CONSTANTS
   	this.LABEL_CHANGED = 'label_changed';
   	this.ANIMATION_FINISHED = 'animation_cycle_finished';
@@ -10,48 +10,55 @@ class AnimationController {
     this.INFINITY = 'infinity';
 
   	//DEBUGGER
-  	this.show_debug_buttons = true;
+  	this.show_debug_buttons = false;
     this.ON_DEBUG = false;
 
     this.config = config;
+
+    this.$animation_cont = $container;
+    this.animation_object = animation;
+
+    //UNCRORRRRRRRRRRRRRRRRRRRRRRECT
+    this.animations_list = ['Trener', 'Scarfman'];
+
+    this.initContainer();
   }
 
 
-  addAnimationObject(config, obj, $container, animations_list) {
-		this.config = Object.assign(config, this.config);
-    this.$animation_cont = $container;
-    this.animations_list = animations_list;
-    this.id = this.config.canvas_id;
+  initContainer() {
+    //add canvas
+    var newCanvas = $('<canvas id="' + this.config.canvas_id + '"></canvas>');
+    this.$animation_cont.append(newCanvas);
 
-		this.animation_name = this.config.animation_name;
-		this.animation_object = obj;
+    //add stage
+    var stage = this.stage = new createjs.Stage(this.config.canvas_id);
+    var height = stage.canvas.height = this.config.container_height;
+    var width = stage.canvas.width = this.config.container_width;
+
+    //add container
+    var animation_container = this.container = new createjs.Container();
+    stage.addChild(animation_container);
+    animation_container.regX = width / 2; 
+    animation_container.regY = height / 2; 
+    animation_container.x = width / 2;
+    animation_container.y = height / 2;
+
+    //add animation
+    this.animation_name = this.config.animation_name;
+
+    this.container.addChild(this.animation_object);
+    stage.update();
+
+    this.setAnimationParameteres();
+
+		//debug
+    this.id = this.config.canvas_id;
 		if ( this.config.show_debug ) this.ON_DEBUG = true;
     if (this.ON_DEBUG) this.initDebugButtons();
-  }
 
-  addAnimationToScreen() {
-  	//add canvas
-    
-  	var newCanvas = $('<canvas id="' + this.config.canvas_id + '"></canvas>');
-		this.$animation_cont.append(newCanvas);
+    //play
+    this.playAnimation();
 
-		//add stage
-		var stage = this.stage = new createjs.Stage(this.config.canvas_id);
-		var height = stage.canvas.height = this.config.container_height;
-		var width = stage.canvas.width = this.config.container_width;
-
-		//add container
-		var animation_container = this.container = new createjs.Container();
-  	stage.addChild(animation_container);
-  	animation_container.regX = width / 2; 
-  	animation_container.regY = height / 2; 
-  	animation_container.x = width / 2;
-  	animation_container.y = height / 2;
-
-		this.container.addChild(this.animation_object);
-  	stage.update();
-
-  	this.setAnimationParameteres();
   }
 
   changeAnimation(new_id) {
@@ -71,6 +78,7 @@ class AnimationController {
   	//scale
   	if ( typeof this.config.scale != 'number' ) this.$animation_cont.children().css('object-fit', this.config.scale);
  		else if( this.config.scale ) this.animation_object.scale = this.config.scale;
+
  		//loop
  		if ( this.config.loop ) this.loop_amount = this.config.loop;
 
@@ -156,6 +164,7 @@ class AnimationController {
   initDebugButtons() {
     var scope = this;
     var $debugger_container = $('<div id="debugger-container-'+ this.id +'"></div>');
+    console.log(this.$animation_cont)
     this.$animation_cont.append($debugger_container);
 
     this.$hidden_content = $('<div id="hidden-content-'+ this.id +'"></div>');
@@ -163,7 +172,6 @@ class AnimationController {
 
     //BUTTONS
     this.debug_buttons = [
-      $('<button class="close-able" id="add-'+ this.id +'"> Add </button>'),
       $('<button class="close-able" id="play-'+ this.id +'"> Play </button>'),
       $('<button class="close-able" id="pause-'+ this.id +'"> Pause </button>'),
       $('<button class="close-able" id="resume-'+ this.id +'"> Resume </button>'),
@@ -175,27 +183,27 @@ class AnimationController {
       scope.$hidden_content.append(x);
     });
 
-    $('#add-' + this.id).one('click', function() {
-      scope.addAnimationToScreen();
-    });
-
     $('#play-' + this.id).one('click', function() {
-      scope.playAnimation();
+      if ( !scope.container ) return;
     });
 
     $('#pause-' + this.id).on('click', function() {
+      if ( !scope.container ) return;
       scope.pauseAnimation();
     });
 
     $('#resume-' + this.id).on('click', function() {
+      if ( !scope.container ) return;
       scope.resumeAnimation();
     });
 
     $('#mirrorX-' + this.id).on('click', function() {
+      if ( !scope.container ) return;
       scope.mirrorX();
     });
 
     $('#mirrorY-' + this.id).on('click', function() {
+      if ( !scope.container ) return;
       scope.mirrorY();
     });
 

@@ -1,22 +1,29 @@
 //TODO: инициализация контроллера без html
-/*
-  если нет контроллера то мы его создаем сами 
-*/
-class AnimationHelper {
+//TODO: передача массива со списком загруженных анимаций
+//!!!не заводить массивы контейнеров а обеспечить работу с ними через события
+  $(function(){
+    //controller
+    var $controller = $('.animator-controller');
+    if( !$controller.length ) return;
+
+    var el_data = $controller.data('animator');
+    var animations_array = el_data && el_data.split(',');   
+    if( !animations_array || !animations_array.length ) {
+      console.warn('Animator: animations data required.');
+      return;
+    }
+    var animatorController = new AnimatorController();
+    var path = 'config.json';
+    animatorController.loadConfig( animations_array, path );
+  });
+    
+
+class AnimatorController {
   constructor() {
-    var scope = this;
-
-    //CONSTANTS
-    this.ASSETS_LOADED = 'assets_loaded';
-    this.CONFIG_FILE = 'config.json';
-
-    //data
-    this.data = {};
+    var scope = this;   
     
     //ASSETS MANAGER
     this.AM = new AssetManager(this);
-    
-    this.initContainersConfig();
 
     $(window).on("animation_object_changed", function(e) {
       var obj = e.detail.obj;
@@ -26,40 +33,16 @@ class AnimationHelper {
     });
   }
 
-  initContainersConfig() {
+  loadConfig( configs, path ){
     var scope = this;
-    $(function(){
-      scope.$containers = $('.animator-container');
-      scope.$controller = $('.animator-controller');
 
-      if( !scope.$controller.length ) {
-        var animations_array = [];
-        scope.$controller = $('<div class="animator-controller"></div>')
-        scope.$containers.each(function(i, e) {
-          scope.$controller.wrapAll($(e));
-          // animations_array.push($(e).data('animator').config);
-        })
-      } else {
-        var el_data = scope.$controller.data('animator');
-        var animations_array = el_data.split(',');   
-      }
-
-      scope.getAssetsConfig(animations_array);
-    });
-  }
-
-  getAssetsConfig(animations_array) {
-    var scope = this;
-    if ( animations_array ) {
-      animations_array.forEach(function(x, i) {
-        $.getJSON( x + scope.CONFIG_FILE, function ( _data ) {
+    configs.forEach(function(x, i) {
+        $.getJSON( x + path, function ( _data ) {
           if( !_data ) return;
-          scope.data[ _data.animation_name ] = scope.data;
-          scope.preloadAssets(_data, animations_array.length - i - 1)
+          scope.preloadAssets( _data, configs.length - i - 1)
         })
-      })  
+      });  
     }
-  }
 
 
   preloadAssets(animation_config, assets_rem) {
@@ -74,26 +57,16 @@ class AnimationHelper {
     }
 
     function handleComplete() {
-      if ( assets_rem == 0 ) {
-        var event = new CustomEvent( scope.ASSETS_LOADED, { detail: {id: animation_config.animation_name}});
-        window.dispatchEvent(event);
-      }
+      var $containers = $('.animator-container');
+
+      $containers.each( function(i, e) {
+        var container_config = $(e).data('animator');
+        if ( container_config.animation_name == animation_config.animation_name ) {
+          var config = Object.assign( animation_config, container_config );
+          scope.AM.addAsset(animation_config.animation_name, function(){ return new lib[animation_config.animation_name]();}, 10)
+          new AnimatorContainer(config, scope.AM.pullAsset(config.animation_name), $(e));
+        }
+      });
     }   
-  }
-
-  initAnimationsContainers(animations_by_id, ids) {
-    var scope = this;
-    this.$containers.each(function(i,e) {
-      var container_data = $(e).data('animator');
-      var animation_name = container_data.animation_name;
-
-      var animation_controller = new AnimationController(scope.data[animation_name]);
-
-      animations_by_id[animation_name].forEach(function(x) {
-        scope.AM.addAsset( animation_name , function() { return x; }, 1);
-      })
-
-      animation_controller.addAnimationObject(container_data, scope.AM.pullAsset( animation_name ), $(e), ids);
-    })
   }
 }
