@@ -54,10 +54,12 @@ class AnimatorContainer {
 		//debug
     this.id = this.config.canvas_id;
 		if ( this.config.show_debug ) this.initDebugButtons();
-    else this.setAnimationParameteres();
+    else {
+      this.setAnimationParameteres();
+      //play
+      this.playAnimation();
+    }
 
-    //play
-    this.playAnimation();
   }
 
   changeAnimation(new_id) {
@@ -221,7 +223,7 @@ class AnimatorContainer {
 
     //BUTTONS
     this.debug_buttons = [
-      $('<button class="close-able" id="play-'+ this.id +'">pause</button>'),
+      $('<button class="close-able" id="play-'+ this.id +'">play</button>'),
       $('<button class="close-able" id="mirrorX-'+ this.id +'"> Mirror X </button>'),
       $('<button class="close-able" id="mirrorY-'+ this.id +'"> Mirror Y </button>')
     ]
@@ -231,9 +233,10 @@ class AnimatorContainer {
     });
 
     $('#play-' + this.id).on('click', function() {
-      if ($(this).text() == 'play') scope.resumeAnimation();
-      else scope.pauseAnimation();
-      $(this).text( $(this).text() == 'play' ? 'pause' : 'play' );
+      if ($(this).text() == 'play') scope.playAnimation();
+      if ($(this).text() == 'resume') scope.resumeAnimation();
+      if ($(this).text() == 'pause') scope.pauseAnimation();
+      $(this).text( $(this).text() == 'play' ? 'pause' : $(this).text() == 'pause' ? 'resume' : 'pause' );
     });
 
     $('#mirrorX-' + this.id).on('click', function() {
