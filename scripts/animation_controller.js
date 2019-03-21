@@ -109,6 +109,7 @@ class AnimatorContainer {
         var event = new CustomEvent( scope.LABEL_CHANGED, { detail: {previous_label: current_label, current_label: scope.animation_object.currentLabel}} );
         window.dispatchEvent(event);
         current_label = scope.animation_object.currentLabel;
+
         if ( stop_animation_on_next_step ) {
           if ( scope.loop_amount ) {
             scope.loop_amount--;
@@ -116,12 +117,9 @@ class AnimatorContainer {
               if ( scope.config.onfinish ) {
                 scope.config = scope.config.onfinish;
                 scope.setAnimationParameteres();
-                //if onfinish doesn't exist
-              } else scope.animation_object.tickEnabled = false;
-            } else { // if loop amount > 0
-              scope.playFromLabel(scope.label_start);
-            } // if loop_amount doesn't exist        
-          } else {
+              }
+            } else scope.playFromLabel(scope.label_start);
+          if ( !scope.loop_amount || scope.loop_amount <= 0 && !scope.config.onfinish) {
             scope.animation_object.tickEnabled = false;
             var event = new CustomEvent( scope.ANIMATION_FINISHED);
             window.dispatchEvent(event);
@@ -131,11 +129,11 @@ class AnimatorContainer {
       }
 
       if (current_label == scope.label_end && scope.loop_amount != scope.INFINITY) stop_animation_on_next_step = true;
+      }
     }
   }
 
   pauseAnimation() {
-    console.log(this.animation_object)
   	this.animation_object.tickEnabled = false;
   }
 
@@ -251,11 +249,15 @@ class AnimatorContainer {
 
   updateLabelSelector() {
     var labels = this.getAnimationLabels();
-    var $selector = $('#labels-selector-' + this.id);
-    $selector.find('option').remove();
-    labels.forEach( function(x) {
-      $selector.append($('<option>', { text: x.label}));
-    });
+    updateSelector($('#start-labels-selector-' + this.id));
+    updateSelector($('#finish-labels-selector-' + this.id));
+
+    function updateSelector($selector) {
+      $selector.find('option').remove();
+      labels.forEach( function(x) {
+        $selector.append($('<option>', { text: x.label}));
+      });
+    }
   }
 
   updateAnimationSelector(animation_id) {

@@ -1,8 +1,8 @@
 //TODO: инициализация контроллера без html
 //TODO: передача массива со списком загруженных анимаций
+//TODO: при дебаге кнопка плей 
 //TODO: настроцка испускаемых событий при загрузке
 //TODO: вбыор loop
-//TODO: возможность выбора анимации
 //!!!не заводить массивы контейнеров а обеспечить работу с ними через события
   $(function(){
     //controller
@@ -32,6 +32,10 @@ class AnimatorController {
     var scope = this;   
 
     const ASSETS_LOADED = this.ASSETS_LOADED = 'assets_loaded';
+
+    this.animations_id = new Set();
+
+    this.configs = [];
     
     //ASSETS MANAGER
     this.AM = new AssetManager(this);
