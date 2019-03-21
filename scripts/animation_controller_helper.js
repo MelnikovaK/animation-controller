@@ -1,6 +1,8 @@
 //TODO: инициализация контроллера без html
-//TODO: кнопка + не должна менять размер
 //TODO: передача массива со списком загруженных анимаций
+//TODO: настроцка испускаемых событий при загрузке
+//TODO: проигрывание последней анимации
+//TODO: selector for end label
 //!!!не заводить массивы контейнеров а обеспечить работу с ними через события
   $(function(){
     //controller
@@ -15,6 +17,12 @@
     }
     var animatorController = new AnimatorController();
     var path = 'config.json';
+    var $containers = $('.animator-container');
+    $containers.each( function(i,e) {
+      var container_data = $(e).data('animator');
+      animatorController.createContainer($(e), container_data);
+    });
+
     animatorController.loadConfig( animations_array, path );
   });
     
@@ -22,6 +30,8 @@
 class AnimatorController {
   constructor() {
     var scope = this;   
+
+    const ASSETS_LOADED = this.ASSETS_LOADED = 'assets_loaded';
     
     //ASSETS MANAGER
     this.AM = new AssetManager(this);
@@ -34,16 +44,20 @@ class AnimatorController {
     });
   }
 
+  createContainer( $element, config) {
+    new AnimatorContainer( $element, config );
+  }
+
   loadConfig( configs, path ){
     var scope = this;
 
     configs.forEach(function(x, i) {
-        $.getJSON( x + path, function ( _data ) {
-          if( !_data ) return;
-          scope.preloadAssets( _data, configs.length - i - 1)
-        })
-      });  
-    }
+      $.getJSON( x + path, function ( _data ) {
+        if( !_data ) return;
+        scope.preloadAssets( _data, configs.length - i - 1)
+      })
+    });  
+  }
 
   preloadAssets(animation_config, assets_rem) {
     var scope = this;
@@ -57,16 +71,9 @@ class AnimatorController {
     }
 
     function handleComplete() {
-      var $containers = $('.animator-container');
-
-      $containers.each( function(i, e) {
-        var container_config = $(e).data('animator');
-        if ( container_config.animation_name == animation_config.animation_name ) {
-          var config = Object.assign( animation_config, container_config );
-          scope.AM.addAsset(animation_config.animation_name, function(){ return new lib[animation_config.animation_name]();}, 10)
-          new AnimatorContainer(config, scope.AM.pullAsset(config.animation_name), $(e));
-        }
-      });
+      scope.AM.addAsset(animation_config.animation_name, function(){ return new lib[animation_config.animation_name]();}, 10)
+      var event = new CustomEvent( scope.ASSETS_LOADED, { detail: {config: animation_config, obj: scope.AM.pullAsset(animation_config.animation_name)}});
+      window.dispatchEvent(event);
     }   
   }
 }

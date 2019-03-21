@@ -1,31 +1,31 @@
 class AnimatorContainer {
 
-  constructor(config, animation, $container) {
+  constructor( $container, config ) {
+    var scope = this;
   	//CONSTANTS
   	this.LABEL_CHANGED = 'label_changed';
   	this.ANIMATION_FINISHED = 'animation_cycle_finished';
     this.ANIMATION_OBJECT_CHANGED = 'animation_object_changed';
 
     //loop parameters
-    this.INFINITY = 'infinity';
-
-  	//DEBUGGER
-  	this.show_debug_buttons = true;
-    this.ON_DEBUG = false;
+    const INFINITY = 'infinity';
 
     this.config = config;
-
+    this.animation_name = config.animation_name;
     this.$animation_cont = $container;
-    this.animation_object = animation;
 
     //UNCRORRRRRRRRRRRRRRRRRRRRRRECT
     this.animations_list = ['Trener', 'Scarfman'];
 
-    this.initContainer();
+    $(window).on("assets_loaded", function(e) {
+      if ( e.detail.config.animation_name == scope.animation_name ) scope.initContainer(e.detail.config, e.detail.obj);
+    });
   }
 
 
-  initContainer() {
+  initContainer(config, animation) {
+    this.config = Object.assign(config, this.config);
+
     //add canvas
     var newCanvas = $('<canvas id="' + this.config.canvas_id + '"></canvas>');
     this.$animation_cont.append(newCanvas);
@@ -44,6 +44,7 @@ class AnimatorContainer {
     animation_container.y = height / 2;
 
     //add animation
+    this.animation_object = animation;
     this.animation_name = this.config.animation_name;
 
     this.container.addChild(this.animation_object);
@@ -52,13 +53,11 @@ class AnimatorContainer {
 
 		//debug
     this.id = this.config.canvas_id;
-		if ( this.config.show_debug ) this.ON_DEBUG = true;
-    if (this.ON_DEBUG) this.initDebugButtons();
+		if ( this.config.show_debug ) this.initDebugButtons();
     else this.setAnimationParameteres();
 
     //play
     this.playAnimation();
-
   }
 
   changeAnimation(new_id) {
@@ -240,13 +239,6 @@ class AnimatorContainer {
       if ( !scope.container ) return;
       scope.mirrorY();
     });
-
-
-
-
-
-
-    if ( !scope.show_debug_buttons ) this.hideDebugButtons(this.id);
   }
 
   updateLabelSelector() {
