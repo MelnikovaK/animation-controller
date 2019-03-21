@@ -121,13 +121,13 @@ class AnimatorContainer {
                 scope.setAnimationParameteres();
               }
             } else scope.playFromLabel(scope.label_start);
+          }
           if ( !scope.loop_amount || scope.loop_amount <= 0 && !scope.config.onfinish) {
             scope.animation_object.tickEnabled = false;
             var event = new CustomEvent( scope.ANIMATION_FINISHED);
             window.dispatchEvent(event);
           }
           stop_animation_on_next_step = false;
-        }
       }
 
       if (current_label == scope.label_end && scope.loop_amount != scope.INFINITY) stop_animation_on_next_step = true;
