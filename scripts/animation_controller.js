@@ -68,6 +68,7 @@ class AnimatorContainer {
     this.animation_name = new_id;
     this.updateLabelSelector(this.animation_name);
     this.updateAnimationSelector(this.animation_name);
+    this.stage.update();
   }
 
   setAnimationParameteres() {
@@ -128,7 +129,7 @@ class AnimatorContainer {
             window.dispatchEvent(event);
           }
           stop_animation_on_next_step = false;
-      }
+        }
 
       if (current_label == scope.label_end && scope.loop_amount != scope.INFINITY) stop_animation_on_next_step = true;
       }
