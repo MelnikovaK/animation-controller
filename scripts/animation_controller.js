@@ -8,7 +8,7 @@ class AnimatorContainer {
     this.ANIMATION_OBJECT_CHANGED = 'animation_object_changed';
 
     //loop parameters
-    const INFINITY = 'infinity';
+    const INFINITY  = this.INFINITY = 'infinity';
 
     this.config = config;
     this.animation_name = config.animation_name;
@@ -159,7 +159,10 @@ class AnimatorContainer {
   	this.animation_object.gotoAndPlay(label);
   }
 
+
+
   // >>> DEBUG >>>
+  
   initDebugButtons() {
     var scope = this;
     var $debugger_container = $('<div class="debugger-container" id="debugger-container-'+ this.id +'"></div>');
@@ -189,28 +192,34 @@ class AnimatorContainer {
     this.updateAnimationSelector(this.animation_name);
   
     $('#animation-selector-' + this.id).change( function() {
-      if ( !scope.container ) return;
-      var selected_label = $(this).val();
-      scope.tickEnabled = true;
-      scope.changeAnimation(selected_label);
+      scope.changeAnimation($(this).val());
     })
 
-    //ANIMATION LABELS SELECTOR
+    //START LABELS SELECTOR
     var labels = scope.getAnimationLabels();
-    
-    var labels_selector = '<select class="close-able" id="labels-selector-'+ this.id +'">';
-    labels.forEach(function(x) {
-      labels_selector += '<option>' + x.label + '</option>';
-    })
-    labels_selector += '</select>';
+    createLabelsSelector($hidden_able_content, 'close-able', 'start-labels-selector-'+ this.id );
 
-    $hidden_able_content.append($(labels_selector));
-
-    $('#labels-selector-' + this.id).change( function() {
-      var selected_label = $(this).val();
-      scope.tickEnabled = true;
-      scope.playFromLabel(selected_label);
+    $('#start-labels-selector-' + this.id).change( function() {
+      scope.playFromLabel($(this).val());
     })
+
+    //FINISH LABELS SELECTOR
+    createLabelsSelector($hidden_able_content, 'close-able', 'finish-labels-selector-'+ this.id );
+    $('#finish-labels-selector-' + this.id).change( function() {
+      console.log(scope.label_end)
+      scope.label_end = $(this).val();
+    })
+
+    function createLabelsSelector( $container, class_name, id, func) {
+      var selector = '<select class="'+ class_name +'" id="'+ id +'">';
+      labels.forEach(function(x) {
+        selector += '<option>' + x.label + '</option>';
+      })
+      selector += '</select>';
+
+      $container.append($(selector));
+    }
+
 
 
     //BUTTONS
