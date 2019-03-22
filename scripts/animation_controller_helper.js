@@ -1,28 +1,42 @@
-//TODO: инициализация контроллера без html
-//TODO: починить debug
-  $(function(){
-    //controller
-    var $controller = $('.animator-controller');
-    if( !$controller.length ) return;
 
-    var el_data = $controller.data('animator');
-    var animations_array = el_data && el_data.split(',');   
-    if( !animations_array || !animations_array.length ) {
-      console.warn('Animator: animations data required.');
-      return;
-    }
-    var animatorController = new AnimatorController();
-    var path = 'config.json';
-    //animation containers
-    var $containers = $('.animator-container');
-    $containers.each( function(i,e) {
-      var container_data = $(e).data('animator');
-      animatorController.createContainer($(e), container_data);
-    });
+$(function(){
+  //controller
+  var $controller = $('.animator-controller');
+  if( !$controller.length ) return;
 
-    animatorController.loadConfig( animations_array, path );
+  var el_data = $controller.data('animator');
+  var animations_array = el_data && el_data.split(',');   
+  if( !animations_array || !animations_array.length ) {
+    console.warn('Animator: animations data required.');
+    return;
+  }
+  var animatorController = new AnimatorController();
+  var path = 'config.json';
+
+  // var $element = $('<div id="anim1" class="animator-container"></div>');
+  // $controller.append($element);
+
+  // var animation_container = animatorController.createContainer( $element, {
+  //   "canvas_id":"2",
+  //   "animation_name": "Scarfman",
+  //   "loop": "1",
+  //   "scale": "contain",
+  //   "container_width": 300, 
+  //   "container_height": 200,
+  //   "show_debug": true,
+  //   "onfinish": { "animation_name": "Trener", "label_start":"Zevanie","label_end": "static", "loop": 7, "scale": "none"} }
+  // );
+
+  //animation containers
+  var $containers = $('.animator-container');
+  $containers.each( function(i,e) {
+    var container_data = $(e).data('animator');
+    animatorController.createContainer($(e), container_data);
   });
-    
+
+  animatorController.loadConfig( animations_array, path );
+});
+  
 
 class AnimatorController {
   constructor() {

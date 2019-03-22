@@ -86,7 +86,7 @@ class AnimatorContainer {
  		else if( this.config.scale ) this.animation_object.scale = +this.config.scale;
 
  		//loop 
- 		if ( this.config.loop ) this.loop_amount = +this.config.loop || 1;
+ 		if ( this.config.loop ) this.loop_amount = this.config.loop || 1;
 
  		//labels
     var labels = this.animation_object.labels;
@@ -119,20 +119,21 @@ class AnimatorContainer {
         current_label = scope.animation_object.currentLabel;
 
         if (stop_animation_on_next_step) {
-          if ( typeof scope.loop_amount == 'number' ) scope.loop_amount--;
+          if ( !isNaN(scope.loop_amount) ) scope.loop_amount--;
           if ( scope.loop_amount > 0 || scope.loop_amount == scope.INFINITY ) scope.playFromLabel( scope.label_start );
           else {
             if ( scope.config.onfinish && !scope.on_debug ) {
-              scope.config = Object.assign(scope.config, scope.config.onfinish);
+              scope.config = scope.config.onfinish;
               scope.setAnimationParameteres();
             } else {
               scope.animation_object.tickEnabled = false;
               var event = new CustomEvent( scope.ANIMATION_FINISHED);
               window.dispatchEvent(event);
               //change play button text
-              
-              scope.play_btn.text('resume');
-              scope.playButton( scope.play_btn.text(), true );
+              if ( scope.on_debug ) {
+                scope.play_btn.text('resume');
+                scope.playButton( scope.play_btn.text(), true );
+              }
             }
           }
           stop_animation_on_next_step = false;
@@ -225,7 +226,7 @@ class AnimatorContainer {
 
     $hidden_able_content.append($(selector));
     $('#loop-selector-' + this.id).change( function() {
-      scope.loop_amount = +$(this).val();
+      scope.loop_amount = ( isNaN(+$(this).val())) ? $(this).val() : +$(this).val();
     })
     this.loop_amount = $('#loop-selector-' + this.id + ' option:selected').text();
 
@@ -256,7 +257,6 @@ class AnimatorContainer {
       if ( !scope.container ) return;
       scope.mirrorY();
     });
-    console.log(this)
   }
 
   playButton(text, finish) {
