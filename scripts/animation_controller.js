@@ -89,7 +89,7 @@ class AnimatorContainer {
  		this.label_start = this.config.label_start || labels[0].label;
  		this.label_end = this.config.label_end || labels[labels.length - 1].label;
 
-  	this.playFromLabel(this.label_start);//-
+  	this.playFromLabel(this.label_start);
   }
 
   changeAnimationObject(new_obj) {
@@ -201,7 +201,8 @@ class AnimatorContainer {
     createLabelsSelector($hidden_able_content, 'close-able', 'start-labels-selector-'+ this.id );
 
     $('#start-labels-selector-' + this.id).change( function() {
-      scope.playFromLabel($(this).val());
+      scope.label_start = $(this).val();
+      scope.playFromLabel(scope.label_start);
     })
 
     //FINISH LABELS SELECTOR
@@ -210,7 +211,20 @@ class AnimatorContainer {
       scope.label_end = $(this).val();
     })
 
-    function createLabelsSelector( $container, class_name, id, func) {
+    //LOOP SELECTOR 
+    var selector = '<select class="close-able" id="loop-selector-'+ this.id +'">';
+    for (var i = 1; i < 6; i++) {
+      selector += '<option>' + i + '</option>';
+    }
+    selector += '</select>';
+
+    $hidden_able_content.append($(selector));
+    $('#loop-selector-' + this.id).change( function() {
+      scope.loop_amount = $(this).val();
+    })
+
+
+    function createLabelsSelector( $container, class_name, id) {
       var selector = '<select class="'+ class_name +'" id="'+ id +'">';
       labels.forEach(function(x) {
         selector += '<option>' + x.label + '</option>';
