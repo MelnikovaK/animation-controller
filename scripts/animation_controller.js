@@ -119,6 +119,7 @@ class AnimatorContainer {
         current_label = scope.animation_object.currentLabel;
 
         if ( stop_animation_on_next_step ) {
+          if (typeof scope.loop_amount === 'number') scope.loop_amount--;
             if ( scope.loop_amount <= 0 ) {
               if ( scope.config.onfinish && !scope.on_debug ) {
                   scope.config = scope.config.onfinish;
@@ -126,12 +127,12 @@ class AnimatorContainer {
               }
             } else scope.playFromLabel(scope.label_start);
           if ( scope.loop_amount <= 0 && (!scope.config.onfinish || scope.on_debug)) {
+            scope.playFromLabel(scope.label_start);
             scope.animation_object.tickEnabled = false;
             var event = new CustomEvent( scope.ANIMATION_FINISHED);
             window.dispatchEvent(event);
           }
           stop_animation_on_next_step = false;
-          if (typeof scope.loop_amount === 'number') scope.loop_amount--;
         }
 
       if (current_label == scope.label_end) stop_animation_on_next_step = true;
