@@ -1,4 +1,4 @@
-
+//после окончания анимации resume воспроизводит анимацию один раз
 $(function(){
   //controller
   var $controller = $('.animator-controller');

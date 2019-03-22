@@ -70,9 +70,10 @@ class AnimatorContainer {
     var event = new CustomEvent( this.ANIMATION_OBJECT_CHANGED, { detail: {new_animation_id: new_id, prev_animation_id: this.animation_name, animation: this.animation_object, obj: this}} );
     window.dispatchEvent(event);
     this.animation_name = new_id;
-    this.updateLabelSelector(this.animation_name);
-    this.updateAnimationSelector(this.animation_name);
-    this.stage.update();
+    if ( this.on_debug ) {
+      this.updateLabelSelector();
+      this.updateAnimationSelector(this.animation_name);
+    }
   }
 
   setAnimationParameteres() {
@@ -132,7 +133,7 @@ class AnimatorContainer {
               //change play button text
               if ( scope.on_debug ) {
                 scope.play_btn.text('resume');
-                scope.playButton( scope.play_btn.text(), true );
+                scope.configPlayButton( scope.play_btn.text(), true );
               }
             }
           }
@@ -185,6 +186,39 @@ class AnimatorContainer {
     var $hidden_able_content = $('<div class="hidden-able-content" id="hidden-able-content-'+ this.id +'"></div>');
     $debugger_container.append($hidden_able_content);
 
+    this.initSelectors($hidden_able_content);
+
+    //BUTTONS
+    var debug_buttons = [
+      $('<button class="close-able" id="play-'+ this.id +'">play</button>'),
+      $('<button class="close-able" id="mirrorX-'+ this.id +'"> Mirror X </button>'),
+      $('<button class="close-able" id="mirrorY-'+ this.id +'"> Mirror Y </button>')
+    ]
+
+    debug_buttons.forEach(function(x) {
+      $hidden_able_content.append(x);
+    });
+
+    scope.play_btn = $('#play-' + this.id);
+
+    $('#play-' + this.id).on('click', function() {
+      scope.configPlayButton( $(this).text(), false );
+      $(this).text( $(this).text() == 'play' ? 'pause' : $(this).text() == 'pause' ? 'resume' : 'pause' );
+    });
+
+    $('#mirrorX-' + this.id).on('click', function() {
+      if ( !scope.container ) return;
+      scope.mirrorX();
+    });
+
+    $('#mirrorY-' + this.id).on('click', function() {
+      if ( !scope.container ) return;
+      scope.mirrorY();
+    });
+  }
+
+  initSelectors($hidden_able_content) {
+    var scope = this;
     //ANIMATION SELECTOR 
     var animation_selector = '<select class="close-able" id="animation-selector-'+ this.id +'">';
     this.animations_list.forEach(function(x) {
@@ -230,42 +264,27 @@ class AnimatorContainer {
     })
     this.loop_amount = $('#loop-selector-' + this.id + ' option:selected').text();
 
-    //BUTTONS
-    var debug_buttons = [
-      $('<button class="close-able" id="play-'+ this.id +'">play</button>'),
-      $('<button class="close-able" id="mirrorX-'+ this.id +'"> Mirror X </button>'),
-      $('<button class="close-able" id="mirrorY-'+ this.id +'"> Mirror Y </button>')
-    ]
 
-    debug_buttons.forEach(function(x) {
-      $hidden_able_content.append(x);
-    });
-
-    scope.play_btn = $('#play-' + this.id);
-
-    $('#play-' + this.id).on('click', function() {
-      scope.playButton( $(this).text(), false );
-      $(this).text( $(this).text() == 'play' ? 'pause' : $(this).text() == 'pause' ? 'resume' : 'pause' );
-    });
-
-    $('#mirrorX-' + this.id).on('click', function() {
-      if ( !scope.container ) return;
-      scope.mirrorX();
-    });
-
-    $('#mirrorY-' + this.id).on('click', function() {
-      if ( !scope.container ) return;
-      scope.mirrorY();
-    });
   }
 
-  playButton(text, finish) {
+  configPlayButton(text, finish) {
     if (text == 'play') this.playAnimation();
     if (text == 'resume') {
       if ( finish ) this.playFromLabel(this.label_start);
       else this.resumeAnimation();
     } 
     if (text == 'pause')  this.pauseAnimation();
+  }
+
+  updateLabelSelector1($selector, prop, is_finish) {
+    var labels = this.getAnimationLabels();
+    $selector.find('option').remove();
+    labels.forEach( function(x) {
+      $selector.append($('<option>', { text: x.label}));
+    });
+
+    this[prop] = $($selector.html() + ' option:selected').text();
+    if (is_finish) $($selector.html() + ' option').prop('selected', function() { return $(this).text() == labels[labels.length - 1].label; });
   }
 
   updateLabelSelector() {
@@ -279,6 +298,7 @@ class AnimatorContainer {
         $selector.append($('<option>', { text: x.label}));
       });
     }
+
     $('#finish-labels-selector-' + this.id + ' option').prop('selected', function() { return $(this).text() == labels[labels.length - 1].label; });
     this.label_start = $('#start-labels-selector-' + this.id + ' option:selected').text();
     this.label_end = $('#finish-labels-selector-' + this.id + ' option:selected').text();
