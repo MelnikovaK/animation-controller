@@ -1,5 +1,4 @@
 //TODO: инициализация контроллера без html
-//TODO: передача массива со списком загруженных анимаций
 //!!!не заводить массивы контейнеров а обеспечить работу с ними через события
   $(function(){
     //controller
@@ -51,10 +50,10 @@ class AnimatorController {
 
   loadConfig( configs, path ){
     var scope = this;
-
     configs.forEach(function(x, i) {
       $.getJSON( x + path, function ( _data ) {
         if( !_data ) return;
+        scope.animations_id.add(_data.animation_name);
         scope.preloadAssets( _data, configs.length - i - 1)
       })
     });  
@@ -72,9 +71,8 @@ class AnimatorController {
     }
 
     function handleComplete() {
-      scope.animations_id.add(animation_config.animation_name);
       scope.AM.addAsset(animation_config.animation_name, function(){ return new lib[animation_config.animation_name]();}, 10)
-      var event = new CustomEvent( scope.ASSETS_LOADED, { detail: {config: animation_config, obj: scope.AM.pullAsset(animation_config.animation_name)}});
+      var event = new CustomEvent( scope.ASSETS_LOADED, { detail: {config: animation_config, obj: scope.AM.pullAsset(animation_config.animation_name), animations_id: scope.animations_id}});
       window.dispatchEvent(event);
     }   
   }

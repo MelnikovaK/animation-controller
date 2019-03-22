@@ -14,10 +14,8 @@ class AnimatorContainer {
     this.animation_name = config.animation_name;
     this.$animation_cont = $container;
 
-    //UNCRORRRRRRRRRRRRRRRRRRRRRRECT
-    this.animations_list = ['Trener', 'Scarfman'];
-
     $(window).on("assets_loaded", function(e) {
+      scope.animations_list = e.detail.animations_id;
       if ( e.detail.config.animation_name == scope.animation_name ) scope.initContainer(e.detail.config, e.detail.obj);
     });
   }
