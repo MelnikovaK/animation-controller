@@ -197,8 +197,7 @@ class AnimatorContainer {
     })
 
     //START LABELS SELECTOR
-    var labels = scope.getAnimationLabels();
-    createLabelsSelector($hidden_able_content, 'close-able', 'start-labels-selector-'+ this.id );
+    $hidden_able_content.append($('<select class="close-able" id="start-labels-selector-'+ this.id+'"></select>'));
 
     $('#start-labels-selector-' + this.id).change( function() {
       scope.label_start = $(this).val();
@@ -206,10 +205,12 @@ class AnimatorContainer {
     })
 
     //FINISH LABELS SELECTOR
-    createLabelsSelector($hidden_able_content, 'close-able', 'finish-labels-selector-'+ this.id );
+    $hidden_able_content.append($('<select class="close-able" id="finish-labels-selector-'+ this.id+'"></select>'));
     $('#finish-labels-selector-' + this.id).change( function() {
       scope.label_end = $(this).val();
     })
+
+    this.updateLabelSelector();
 
     //LOOP SELECTOR 
     var selector = '<select class="close-able" id="loop-selector-'+ this.id +'">';
@@ -222,19 +223,6 @@ class AnimatorContainer {
     $('#loop-selector-' + this.id).change( function() {
       scope.loop_amount = $(this).val();
     })
-
-
-    function createLabelsSelector( $container, class_name, id) {
-      var selector = '<select class="'+ class_name +'" id="'+ id +'">';
-      labels.forEach(function(x) {
-        selector += '<option>' + x.label + '</option>';
-      })
-      selector += '</select>';
-
-      $container.append($(selector));
-    }
-
-
 
     //BUTTONS
     this.debug_buttons = [
@@ -276,6 +264,7 @@ class AnimatorContainer {
         $selector.append($('<option>', { text: x.label}));
       });
     }
+    $('#finish-labels-selector-' + this.id + ' option').prop('selected', function() { return $(this).text() == labels[labels.length - 1].label; });
   }
 
   updateAnimationSelector(animation_id) {
