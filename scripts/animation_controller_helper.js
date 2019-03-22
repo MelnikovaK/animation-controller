@@ -1,6 +1,5 @@
 //TODO: инициализация контроллера без html
 //TODO: починить debug
-//!!!не заводить массивы контейнеров а обеспечить работу с ними через события
   $(function(){
     //controller
     var $controller = $('.animator-controller');

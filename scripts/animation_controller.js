@@ -83,10 +83,10 @@ class AnimatorContainer {
   	if ( this.config.height ) this.animation_object.scaleY = this.config.height / this.animation_object.getBounds().height;
   	//scale
   	if ( typeof this.config.scale != 'number' ) this.$animation_cont.children().css('object-fit', this.config.scale);
- 		else if( this.config.scale ) this.animation_object.scale = this.config.scale;
+ 		else if( this.config.scale ) this.animation_object.scale = +this.config.scale;
 
  		//loop 
- 		if ( this.config.loop ) this.loop_amount = this.config.loop || 1;
+ 		if ( this.config.loop ) this.loop_amount = +this.config.loop || 1;
 
  		//labels
     var labels = this.animation_object.labels;
@@ -118,23 +118,25 @@ class AnimatorContainer {
         window.dispatchEvent(event);
         current_label = scope.animation_object.currentLabel;
 
-        if ( stop_animation_on_next_step ) {
-          if (typeof scope.loop_amount === 'number') scope.loop_amount--;
-            if ( scope.loop_amount <= 0 ) {
-              if ( scope.config.onfinish && !scope.on_debug ) {
-                  scope.config = scope.config.onfinish;
-                  scope.setAnimationParameteres();
-              }
-            } else scope.playFromLabel(scope.label_start);
-          if ( scope.loop_amount <= 0 && (!scope.config.onfinish || scope.on_debug)) {
-            scope.playFromLabel(scope.label_start);
-            scope.animation_object.tickEnabled = false;
-            var event = new CustomEvent( scope.ANIMATION_FINISHED);
-            window.dispatchEvent(event);
+        if (stop_animation_on_next_step) {
+          if ( typeof scope.loop_amount == 'number' ) scope.loop_amount--;
+          if ( scope.loop_amount > 0 || scope.loop_amount == scope.INFINITY ) scope.playFromLabel( scope.label_start );
+          else {
+            if ( scope.config.onfinish && !scope.on_debug ) {
+              scope.config = Object.assign(scope.config, scope.config.onfinish);
+              scope.setAnimationParameteres();
+            } else {
+              scope.animation_object.tickEnabled = false;
+              var event = new CustomEvent( scope.ANIMATION_FINISHED);
+              window.dispatchEvent(event);
+              //change play button text
+              
+              scope.play_btn.text('resume');
+              scope.playButton( scope.play_btn.text(), true );
+            }
           }
           stop_animation_on_next_step = false;
         }
-
       if (current_label == scope.label_end) stop_animation_on_next_step = true;
       }
     }
@@ -228,20 +230,20 @@ class AnimatorContainer {
     this.loop_amount = $('#loop-selector-' + this.id + ' option:selected').text();
 
     //BUTTONS
-    this.debug_buttons = [
+    var debug_buttons = [
       $('<button class="close-able" id="play-'+ this.id +'">play</button>'),
       $('<button class="close-able" id="mirrorX-'+ this.id +'"> Mirror X </button>'),
       $('<button class="close-able" id="mirrorY-'+ this.id +'"> Mirror Y </button>')
     ]
 
-    this.debug_buttons.forEach(function(x) {
+    debug_buttons.forEach(function(x) {
       $hidden_able_content.append(x);
     });
 
+    scope.play_btn = $('#play-' + this.id);
+
     $('#play-' + this.id).on('click', function() {
-      if ($(this).text() == 'play') scope.playAnimation();
-      if ($(this).text() == 'resume') scope.resumeAnimation();
-      if ($(this).text() == 'pause') scope.pauseAnimation();
+      scope.playButton( $(this).text(), false );
       $(this).text( $(this).text() == 'play' ? 'pause' : $(this).text() == 'pause' ? 'resume' : 'pause' );
     });
 
@@ -255,6 +257,15 @@ class AnimatorContainer {
       scope.mirrorY();
     });
     console.log(this)
+  }
+
+  playButton(text, finish) {
+    if (text == 'play') this.playAnimation();
+    if (text == 'resume') {
+      if ( finish ) this.playFromLabel(this.label_start);
+      else this.resumeAnimation();
+    } 
+    if (text == 'pause')  this.pauseAnimation();
   }
 
   updateLabelSelector() {
