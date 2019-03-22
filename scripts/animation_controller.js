@@ -10,6 +10,9 @@ class AnimatorContainer {
     //loop parameters
     const INFINITY  = this.INFINITY = 'infinity';
 
+    //debug parameters
+    this.on_debug = false;
+
     this.config = config;
     this.animation_name = config.animation_name;
     this.$animation_cont = $container;
@@ -51,7 +54,10 @@ class AnimatorContainer {
 
 		//debug
     this.id = this.config.canvas_id;
-		if ( this.config.show_debug ) this.initDebugButtons();
+		if ( this.config.on_debug ) {
+      this.on_debug = true;
+      this.initDebugButtons();
+    }
     else {
       this.setAnimationParameteres();
       //play
@@ -79,11 +85,12 @@ class AnimatorContainer {
   	if ( typeof this.config.scale != 'number' ) this.$animation_cont.children().css('object-fit', this.config.scale);
  		else if( this.config.scale ) this.animation_object.scale = this.config.scale;
 
- 		//loop
- 		if ( this.config.loop ) this.loop_amount = this.config.loop;
+ 		//loop 
+ 		if ( this.config.loop ) this.loop_amount = this.config.loop || 1;
 
  		//labels
     var labels = this.animation_object.labels;
+
  		this.label_start = this.config.label_start || labels[0].label;
  		this.label_end = this.config.label_end || labels[labels.length - 1].label;
 
@@ -112,24 +119,22 @@ class AnimatorContainer {
         current_label = scope.animation_object.currentLabel;
 
         if ( stop_animation_on_next_step ) {
-          if ( scope.loop_amount ) {
-            scope.loop_amount--;
             if ( scope.loop_amount <= 0 ) {
-              if ( scope.config.onfinish ) {
-                scope.config = scope.config.onfinish;
-                scope.setAnimationParameteres();
+              if ( scope.config.onfinish && !scope.on_debug ) {
+                  scope.config = scope.config.onfinish;
+                  scope.setAnimationParameteres();
               }
             } else scope.playFromLabel(scope.label_start);
-          }
-          if ( !scope.loop_amount || scope.loop_amount <= 0 && !scope.config.onfinish) {
+          if ( scope.loop_amount <= 0 && (!scope.config.onfinish || scope.on_debug)) {
             scope.animation_object.tickEnabled = false;
             var event = new CustomEvent( scope.ANIMATION_FINISHED);
             window.dispatchEvent(event);
           }
           stop_animation_on_next_step = false;
+          if (typeof scope.loop_amount === 'number') scope.loop_amount--;
         }
 
-      if (current_label == scope.label_end && scope.loop_amount != scope.INFINITY) stop_animation_on_next_step = true;
+      if (current_label == scope.label_end) stop_animation_on_next_step = true;
       }
     }
   }
@@ -154,14 +159,11 @@ class AnimatorContainer {
   	return this.animation_object.labels;
   }
 
-  playFromLabel(label,label_end,loop,onComplete) {
+  playFromLabel(label) {
   	this.animation_object.gotoAndPlay(label);
   }
 
-
-
   // >>> DEBUG >>>
-  
   initDebugButtons() {
     var scope = this;
     var $debugger_container = $('<div class="debugger-container" id="debugger-container-'+ this.id +'"></div>');
@@ -212,15 +214,17 @@ class AnimatorContainer {
 
     //LOOP SELECTOR 
     var selector = '<select class="close-able" id="loop-selector-'+ this.id +'">';
-    for (var i = 1; i < 6; i++) {
-      selector += '<option>' + i + '</option>';
+    for (var i = 0; i < 6; i++) {
+      if ( i == 0 ) selector += '<option>' + scope.INFINITY + '</option>';
+      else selector += '<option>' + i + '</option>';
     }
     selector += '</select>';
 
     $hidden_able_content.append($(selector));
     $('#loop-selector-' + this.id).change( function() {
-      scope.loop_amount = $(this).val();
+      scope.loop_amount = +$(this).val();
     })
+    this.loop_amount = $('#loop-selector-' + this.id + ' option:selected').text();
 
     //BUTTONS
     this.debug_buttons = [
@@ -249,6 +253,7 @@ class AnimatorContainer {
       if ( !scope.container ) return;
       scope.mirrorY();
     });
+    console.log(this)
   }
 
   updateLabelSelector() {
@@ -263,6 +268,8 @@ class AnimatorContainer {
       });
     }
     $('#finish-labels-selector-' + this.id + ' option').prop('selected', function() { return $(this).text() == labels[labels.length - 1].label; });
+    this.label_start = $('#start-labels-selector-' + this.id + ' option:selected').text();
+    this.label_end = $('#finish-labels-selector-' + this.id + ' option:selected').text();
   }
 
   updateAnimationSelector(animation_id) {

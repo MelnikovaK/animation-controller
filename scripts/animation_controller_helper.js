@@ -1,4 +1,5 @@
 //TODO: инициализация контроллера без html
+//TODO: починить debug
 //!!!не заводить массивы контейнеров а обеспечить работу с ними через события
   $(function(){
     //controller
@@ -13,6 +14,7 @@
     }
     var animatorController = new AnimatorController();
     var path = 'config.json';
+    //animation containers
     var $containers = $('.animator-container');
     $containers.each( function(i,e) {
       var container_data = $(e).data('animator');
