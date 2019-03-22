@@ -133,7 +133,7 @@ class AnimatorContainer {
               //change play button text
               if ( scope.on_debug ) {
                 scope.play_btn.text('resume');
-                scope.configPlayButton( scope.play_btn.text(), true );
+                scope.playButton( scope.play_btn.text(), true );
               }
             }
           }
@@ -202,7 +202,7 @@ class AnimatorContainer {
     scope.play_btn = $('#play-' + this.id);
 
     $('#play-' + this.id).on('click', function() {
-      scope.configPlayButton( $(this).text(), false );
+      scope.playButton( $(this).text(), false );
       $(this).text( $(this).text() == 'play' ? 'pause' : $(this).text() == 'pause' ? 'resume' : 'pause' );
     });
 
@@ -215,6 +215,8 @@ class AnimatorContainer {
       if ( !scope.container ) return;
       scope.mirrorY();
     });
+
+    this.initParametersFromDebug();
   }
 
   initSelectors($hidden_able_content) {
@@ -226,7 +228,9 @@ class AnimatorContainer {
     })
     animation_selector += '</select>';
 
-    $hidden_able_content.append($(animation_selector));
+    this.$animation_selector = $(animation_selector);
+
+    $hidden_able_content.append(this.$animation_selector);
 
     this.updateAnimationSelector(this.animation_name);
   
@@ -235,7 +239,8 @@ class AnimatorContainer {
     })
 
     //START LABELS SELECTOR
-    $hidden_able_content.append($('<select class="close-able" id="start-labels-selector-'+ this.id+'"></select>'));
+    this.start_label_selector = $('<select class="close-able" id="start-labels-selector-'+ this.id+'"></select>');
+    $hidden_able_content.append(this.start_label_selector);
 
     $('#start-labels-selector-' + this.id).change( function() {
       scope.label_start = $(this).val();
@@ -243,7 +248,8 @@ class AnimatorContainer {
     })
 
     //FINISH LABELS SELECTOR
-    $hidden_able_content.append($('<select class="close-able" id="finish-labels-selector-'+ this.id+'"></select>'));
+    this.finish_label_selector = $('<select class="close-able" id="finish-labels-selector-'+ this.id+'"></select>'); 
+    $hidden_able_content.append(this.finish_label_selector);
     $('#finish-labels-selector-' + this.id).change( function() {
       scope.label_end = $(this).val();
     })
@@ -263,17 +269,21 @@ class AnimatorContainer {
       scope.loop_amount = ( isNaN(+$(this).val())) ? $(this).val() : +$(this).val();
     })
     this.loop_amount = $('#loop-selector-' + this.id + ' option:selected').text();
-
-
   }
 
-  configPlayButton(text, finish) {
+
+
+  playButton(text, finish) {
     if (text == 'play') this.playAnimation();
     if (text == 'resume') {
       if ( finish ) this.playFromLabel(this.label_start);
       else this.resumeAnimation();
     } 
     if (text == 'pause')  this.pauseAnimation();
+  }
+
+  initParametersFromDebug() {
+    this.label_start = $(this.start_label_selector.html() + ' option:selected').text();
   }
 
   updateLabelSelector1($selector, prop, is_finish) {
@@ -300,8 +310,8 @@ class AnimatorContainer {
     }
 
     $('#finish-labels-selector-' + this.id + ' option').prop('selected', function() { return $(this).text() == labels[labels.length - 1].label; });
-    this.label_start = $('#start-labels-selector-' + this.id + ' option:selected').text();
-    this.label_end = $('#finish-labels-selector-' + this.id + ' option:selected').text();
+    // this.label_start = $('#start-labels-selector-' + this.id + ' option:selected').text();
+    // this.label_end = $('#finish-labels-selector-' + this.id + ' option:selected').text();
   }
 
   updateAnimationSelector(animation_id) {
